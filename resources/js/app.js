@@ -9,6 +9,7 @@ require('./bootstrap');
 // import Vue from "vue";
 import Vuetify from "vuetify";
 import { InertiaApp } from "@inertiajs/inertia-vue";
+import Swal from "sweetalert2";
 
 import "vuetify/dist/vuetify.min.css";
 
@@ -16,6 +17,8 @@ window.Vue = require('vue').default;
 
 Vue.use(InertiaApp);
 Vue.use(Vuetify);
+
+require("./filters");
 
 /**
  * The following block of code may be used to automatically register your
@@ -35,6 +38,19 @@ Vue.use(Vuetify);
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "bottom",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    onOpen: toast => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+    }
+});
+window.Toast = Toast;
 
 const app = document.getElementById("app");
 
