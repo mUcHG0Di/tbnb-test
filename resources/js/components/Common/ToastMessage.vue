@@ -8,17 +8,10 @@
 
 	export default {
 		name: 'ToastMessage',
-		props: {
-			class: {
-				type: String,
-				default: () => ('w-10/12'),
-			},
-		},
 
 		watch: {
-			"$page.props.flash": function(newVal, oldVal) {
+			"$page.props.flash": function() {
 				if (!this.$page.props.flash) {
-					console.log('No value for success')
 					return;
 				}
 
@@ -28,17 +21,6 @@
 					Toast.fire({icon: 'error', title: this.$page.props.flash.error});
 				}
 			}
-		},
-
-		data() {
-			// const $page = computed(() => (usePage().props.value));
-			return { 
-				// $page,
-			};
-		},
-
-		computed: function() {
-
 		},
 	}
 </script>

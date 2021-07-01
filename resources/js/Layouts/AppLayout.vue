@@ -1,52 +1,38 @@
 <template>
     <div>
-        <div>
-            <v-card
-                class="mx-auto overflow-hidden"
+        <v-app>
+
+            <ToastMessage />
+
+            <v-app-bar
+                dark
+                color="#29C2AF"
+                elevation="2"
+                scroll-target="#scrolling-techniques-7"
             >
-                <v-app-bar
-                    color="deep-purple"
-                    dark
-                >
-                <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
-                <v-toolbar-title>TurnoverBnB</v-toolbar-title>
-                </v-app-bar>
+                <v-container>
+                    <v-toolbar-title class="px-3">TurnoverBnb</v-toolbar-title>
+                </v-container>
 
-                <v-navigation-drawer
-                    v-model="drawer"
-                    absolute
-                    temporary
-                >
-                    <v-list
-                        nav
-                        dense
-                    >
-                        <v-list-item-group
-                            v-model="group"
-                            active-class="deep-purple--text text--accent-4"
-                        >
-                            <v-list-item>
-                                <v-list-item-icon>
-                                <v-icon>mdi-briefcase</v-icon>
-                                </v-list-item-icon>
-                                <v-list-item-title>Products</v-list-item-title>
-                            </v-list-item>
-                        </v-list-item-group>
-                    </v-list>
-                </v-navigation-drawer>
+            </v-app-bar>
 
-                <main>
-                <slot></slot>
-            </main>
-            </v-card>
-
-        </div>
+            <v-sheet
+                id="scrolling-techniques-7"
+                class="overflow-y-auto h-full"
+            >
+                <v-container style="padding-top: 15px; padding-bottom: 15px; height: 100%;">
+                    <main>
+                        <slot></slot>
+                    </main>
+                </v-container>
+            </v-sheet>
+        </v-app>
     </div>
 </template>
 
 <script>
-    import ToastMessage from '../Components/Common/ToastMessage';
+    import ToastMessage from '@/Components/Common/ToastMessage';
 
     export default {
         name: 'AppLayout',
@@ -54,26 +40,10 @@
             ToastMessage,
         },
 
-        mounted: function() {
-
-        },
-
         data() {
             return {
                 drawer: false,
                 group: null,
-                items: [
-                    {
-                        title: "Fee Request",
-                        icon: "mdi-cash-multiple",
-                        method: () => this.feeRequest()
-                    },
-                    {
-                        title: "Profile",
-                        icon: "mdi-account-badge-horizontal",
-                        method: () => this.profile()
-                    }
-                ]
             };
         },
     }

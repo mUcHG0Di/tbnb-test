@@ -18,5 +18,5 @@ Route::get('/', function () {
     return redirect()->route('productos.index');
 });
 
-Route::resource('/productos', ProductController::class);
+Route::resource('/products', ProductController::class)->except(['create', 'edit']);
 

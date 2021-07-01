@@ -1,84 +1,89 @@
 <template>
     <app-layout>
-        <h1>Hello world</h1>
+        <v-container>
+            <v-row>
+                <v-card-title>Products</v-card-title>
+
+                <v-spacer></v-spacer>
+
+                <v-dialog
+                    v-model="form"
+                    persistent
+                    max-width="600px"
+                >
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn dark color="success" class="m-2" v-bind="attrs" v-on="on">
+                            <v-icon small class="mr-1">mdi-plus</v-icon>
+                            Create
+                        </v-btn>
+                    </template>
+                    <Form @close="form = !form" />
+                </v-dialog>
+                <v-btn dark color="primary" class="m-2">
+                    <v-icon small class="mr-1">mdi-pencil</v-icon>
+                    Update
+                </v-btn>
+                <v-btn dark color="error" class="m-2">
+                    <v-icon small class="mr-1">mdi-delete</v-icon>
+                    Delete
+                </v-btn>
+            </v-row>
+
+            <Table
+                :filters="queryBuilderProps.filters"
+                :search="queryBuilderProps.search"
+                :columns="queryBuilderProps.columns"
+                :on-update="setQueryBuilder"
+                :meta="products"
+            >
+                <template #head>
+                    <tr>
+                        <th @click.prevent="sortBy('uuid')">UUID</th>
+                        <th v-show="showColumn('name')" @click.prevent="sortBy('name')">Name</th>
+                        <th v-show="showColumn('description')" @click.prevent="sortBy('description')">Description</th>
+                        <th v-show="showColumn('price')" @click.prevent="sortBy('price')">Price</th>
+                        <th v-show="showColumn('quantity')" @click.prevent="sortBy('quantity')">Quantity</th>
+                    </tr>
+                </template>
+
+                <template #body>
+                    <tr v-for="product in products.data" :key="product.id">
+                        <td>{{ product.uuid }}</td>
+                        <td v-show="showColumn('name')">{{ product.name }}</td>
+                        <td v-show="showColumn('description')">{{ product.description }}</td>
+                        <td v-show="showColumn('price')">{{ product.price }}</td>
+                        <td v-show="showColumn('quantity')">{{ product.quantity }}</td>
+                    </tr>
+                </template>
+            </Table>
+
+        </v-container>
+
     </app-layout>
 </template>
 
 
 <script>
-    import AppLayout from '../../Layouts/AppLayout'
+    import AppLayout from '@/Layouts/AppLayout';
+    import Form from './Form';
+    import { InteractsWithQueryBuilder, Tailwind2 } from '@protonemedia/inertiajs-tables-laravel-query-builder';
 
     export default {
         name: 'products-index',
         props: {
-            products: Array,
+            products: Object,
         },
+        mixins: [ InteractsWithQueryBuilder ],
         components: {
             AppLayout,
+            Form,
+            Table: Tailwind2.Table,
+        },
+
+        data: function() {
+            return {
+                form: false,
+            };
         },
     }
 </script>
-
-<style scoped>
-    .bg-gray-100 {
-        background-color: #f7fafc;
-        background-color: rgba(247, 250, 252, var(--tw-bg-opacity));
-    }
-
-    .border-gray-200 {
-        border-color: #edf2f7;
-        border-color: rgba(237, 242, 247, var(--tw-border-opacity));
-    }
-
-    .text-gray-400 {
-        color: #cbd5e0;
-        color: rgba(203, 213, 224, var(--tw-text-opacity));
-    }
-
-    .text-gray-500 {
-        color: #a0aec0;
-        color: rgba(160, 174, 192, var(--tw-text-opacity));
-    }
-
-    .text-gray-600 {
-        color: #718096;
-        color: rgba(113, 128, 150, var(--tw-text-opacity));
-    }
-
-    .text-gray-700 {
-        color: #4a5568;
-        color: rgba(74, 85, 104, var(--tw-text-opacity));
-    }
-
-    .text-gray-900 {
-        color: #1a202c;
-        color: rgba(26, 32, 44, var(--tw-text-opacity));
-    }
-
-    @media (prefers-color-scheme: dark) {
-        .dark\:bg-gray-800 {
-            background-color: #2d3748;
-            background-color: rgba(45, 55, 72, var(--tw-bg-opacity));
-        }
-
-        .dark\:bg-gray-900 {
-            background-color: #1a202c;
-            background-color: rgba(26, 32, 44, var(--tw-bg-opacity));
-        }
-
-        .dark\:border-gray-700 {
-            border-color: #4a5568;
-            border-color: rgba(74, 85, 104, var(--tw-border-opacity));
-        }
-
-        .dark\:text-white {
-            color: #fff;
-            color: rgba(255, 255, 255, var(--tw-text-opacity));
-        }
-
-        .dark\:text-gray-400 {
-            color: #cbd5e0;
-            color: rgba(203, 213, 224, var(--tw-text-opacity));
-        }
-    }
-</style>
