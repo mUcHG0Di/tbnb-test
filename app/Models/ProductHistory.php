@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ProductHistory extends Model
+{
+    use HasFactory;
+
+    /**
+     * Determine if the model uses timestamps.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
+     * Mass assign attributes
+     *
+     * @var string[]
+     */
+    protected $fillable = ['date'];
+
+    /**
+     * Belongs to product relation
+     *
+     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+}

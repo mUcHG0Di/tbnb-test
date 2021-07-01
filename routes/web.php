@@ -18,5 +18,11 @@ Route::get('/', function () {
     return redirect()->route('productos.index');
 });
 
-Route::resource('/products', ProductController::class)->except(['create', 'edit']);
+Route::post('/products/store/multiple', [ProductController::class, 'bulkStore'])
+    ->name('products.store.multiple');
+Route::patch('/products/update/multiple', [ProductController::class, 'bulkUpdate'])
+    ->name('products.update.multiple');
+Route::delete('/products', [ProductController::class, 'bulkDestroy'])
+    ->name('products.destroy.multiple');
+Route::resource('/products', ProductController::class);
 
