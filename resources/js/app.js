@@ -62,7 +62,26 @@ new Vue({
                 initialPage: JSON.parse(app.dataset.page),
                 resolveComponent: name => require(`./Pages/${name}`).default
             }
-        })
+        }),
+    methods: {
+        confirmDestroy: (title, message, callback) => {
+            Swal.fire({
+                icon: "warning",
+                title: title,
+                html: `${message}`,
+                showConfirmButton: true,
+                confirmButtonText: 'Yes, remove',
+                confirmButtonColor: '#EC0000',
+                showCancelButton: true,
+                cancelButtonText: "Cancel"
+            }).then(result => {
+                if (result.isConfirmed) {
+                    // Action
+                    callback();
+                }
+            });
+        }
+    }
 }).$mount(app);
 
 // const app = new Vue({
