@@ -9,6 +9,16 @@
 
                 <v-btn
                     elevation="1"
+                    color="primary"
+                    class="m-2"
+                    :disabled="bulkForm.products.length != 1"
+                    @click="showDialog = !showDialog"
+                >
+                    <v-icon small class="mr-1">mdi-eye</v-icon>
+                    Show
+                </v-btn>
+                <v-btn
+                    elevation="1"
                     color="success"
                     class="m-2"
                     @click="editMode = false; formDialog = !formDialog"
@@ -18,8 +28,8 @@
                 </v-btn>
                 <v-btn
                     elevation="1"
-                    color="primary"
-                    class="m-2"
+                    color="orange darken-2"
+                    class="m-2 white--text"
                     :disabled="bulkForm.products.length <= 0"
                     @click="editMode = true; formDialog = !formDialog"
                 >
@@ -74,17 +84,21 @@
                     </tr>
                 </template>
             </Table>
-
         </v-container>
 
-        <Form v-if="formDialog" :showing="formDialog" :selectedProducts="editMode ? bulkForm.products : [emptyProduct]" @close="formDialog = !formDialog" />
+        <FormMultiple
+            v-if="formDialog"
+            :showing="formDialog"
+            :selectedProducts="editMode ? bulkForm.products : [emptyProduct]"
+            @close="formDialog = !formDialog; redirect();"
+        />
     </app-layout>
 </template>
 
 
 <script>
     import AppLayout from '@/Layouts/AppLayout';
-    import Form from './Form';
+    import FormMultiple from './FormMultiple';
     import { InteractsWithQueryBuilder, Tailwind2 } from '@protonemedia/inertiajs-tables-laravel-query-builder';
 
     export default {
@@ -96,12 +110,13 @@
         mixins: [ InteractsWithQueryBuilder ],
         components: {
             AppLayout,
-            Form,
+            FormMultiple,
             Table: Tailwind2.Table,
         },
 
         data: function() {
             return {
+                showDialog: false,
                 formDialog: false,
                 emptyProduct: {
                     name: null,
@@ -119,6 +134,7 @@
 
         mounted: function() {
             this.formDialog = this.formOpened;
+            this.bulkForm.products = [];
         },
 
         methods: {
@@ -129,7 +145,10 @@
                         products_uuids: data.products.map((product) => (product.uuid)),
                     }))
                     .delete(route('products.destroy.multiple'), {
-                        onSuccess: () => {},
+                        onSuccess: () => {
+                            this.bulkForm.products = [];
+                            this.redirect();
+                        },
                         onError: () => {},
                     });
                 })
@@ -143,6 +162,12 @@
                 });
                 message += "</ul>";
                 return message;
+            },
+
+            redirect: function() {
+                this.$inertia.visit(route('products.index'), {
+                    only: ['products'],
+                })
             },
         },
     }

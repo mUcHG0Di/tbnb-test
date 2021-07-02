@@ -31,4 +31,23 @@ class BulkStoreUpdateRequest extends FormRequest
             'products.*.quantity' => ['required', 'numeric', 'min:1'],
         ];
     }
+
+    /**
+     * Custom messages
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'products.*.name.required' => 'The name field is required.',
+            'products.*.description.max' => 'The description field max chars is :max.',
+            'products.*.price.required' => 'The price field is required.',
+            'products.*.price.numeric' => 'The price value must be numeric.',
+            'products.*.price.min' => 'The price must be at least :min.',
+            'products.*.quantity.required' => 'The price field is required.',
+            'products.*.quantity.numeric' => 'The price value must be numeric.',
+            'products.*.quantity.min' => 'The price must be at least :min.'
+        ];
+    }
 }

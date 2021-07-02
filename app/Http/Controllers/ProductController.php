@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Product\BulkStoreUpdateRequest;
 use App\Http\Requests\Product\DestroyRequest;
-use App\Http\Requests\Product\StoreRequest;
+use App\Http\Requests\Product\StoreUpdateRequest;
 use App\Http\Requests\Product\UpdateRequest;
 use App\Models\Product;
 use Illuminate\Support\Str;
@@ -14,6 +14,7 @@ use Inertia\Inertia;
 use ProtoneMedia\LaravelQueryBuilderInertiaJs\InertiaTable;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
+use WF\Batch\Batch;
 
 class ProductController extends Controller
 {
@@ -34,7 +35,6 @@ class ProductController extends Controller
     public function __construct()
     {
         $this->tableName = (new Product)->getTable();
-        $this->indexRedirect = redirect()->route('products.index', [], 301);
         $this->columns = [
             'uuid' => 'UUID',
             'name' => 'Name',
@@ -45,8 +45,18 @@ class ProductController extends Controller
     }
 
     /**
-     * Get products paginated to show
-     * in the InertiaTable
+     * Redirects to index helper
+     *
+     * @return Illuminate\Http\Response
+     */
+    private function indexRedirect()
+    {
+        return redirect()->route('products.index');
+    }
+
+    /**
+     * Get products paginated for
+     * the InertiaTable
      *
      * @return LengthAwarePaginator
      */
@@ -113,26 +123,33 @@ class ProductController extends Controller
      * @param StoreRequest $request
      * @return void
      */
-    public function store(StoreRequest $request)
+    public function store(StoreUpdateRequest $request)
     {
         try {
             Product::create($request->all());
-            return $this->indexRedirect->with('success', 'Product created successfully!');
+            return $this->indexRedirect()->with('success', 'Product created successfully!');
         } catch (\Exception $e) {
-            return $this->indexRedirect->with('error', 'Product could not be created. ' . $this->getError($e));
+            return $this->indexRedirect()->with('error', 'Product could not be created. ' . $this->getError($e));
         }
     }
 
+    /**
+     * Bulk store resources
+     *
+     * @param BulkStoreUpdateRequest $request
+     * @return Illuminate\Http\Response
+     */
     public function bulkStore(BulkStoreUpdateRequest $request)
     {
         try {
             // Add UUID to each product
             $products = array_map(fn($product) => $product += ['uuid' => Str::uuid()], $request->products);
-            Product::insert($products)
-                    ->each(fn($product) => $product->history()->create(['date' => now()]));
-            return $this->indexRedirect->with('success', 'Products saved successfully.');
+            // Batch insert of products with event triggering
+            Batch::of(Product::class, $products)->save()->now();
+
+            return $this->indexRedirect()->with('success', 'Products saved successfully.');
         } catch (\Exception $e) {
-            return $this->indexRedirect->with('error', 'Products could not be saved. ' . $this->getError($e));
+            return $this->indexRedirect()->with('error', 'Products could not be saved. ' . $this->getError($e));
         }
     }
 
@@ -168,27 +185,34 @@ class ProductController extends Controller
     /**
      * Update the resource
      *
-     * @param UpdateRequest $request
+     * @param StoreUpdateRequest $request
      * @param Product $product
      * @return Iluminate\Http\Response
      */
-    public function update(UpdateRequest $request, Product $product)
+    public function update(StoreUpdateRequest $request, Product $product)
     {
-        // TODO: update the resource
+        try {
+            $product->update($request->all());
+            return $this->indexRedirect()->with('success', 'Product created successfully!');
+        } catch (\Exception $e) {
+            return $this->indexRedirect()->with('error', 'Product could not be created. ' . $this->getError($e));
+        }
     }
 
+    /**
+     * Bulk update resources
+     *
+     * @param BulkStoreUpdateRequest $request
+     * @return Illuminate\Http\Response
+     */
     public function bulkUpdate(BulkStoreUpdateRequest $request)
     {
-        DB::beginTransaction();
         try {
-            DB::table($this->tableName)->update($request->products);
-            DB::commit();
-
-            return $this->indexRedirect->with('success', 'Products saved successfully.');
+            // Batch update of products with event triggering
+            Batch::of(Product::class, $request->products)->save();
+            return $this->indexRedirect()->with('success', 'Products saved successfully.');
         } catch (\Exception $e) {
-            DB::rollback();
-
-            return $this->indexRedirect->with('error', 'Products could not be saved. ' . $this->getError($e));
+            return $this->indexRedirect()->with('error', 'Products could not be saved. ' . $this->getError($e));
         }
     }
 
@@ -202,9 +226,9 @@ class ProductController extends Controller
     {
         try {
             $product->delete();
-            return $this->indexRedirect->with('success', 'Product removed successfully.');
+            return $this->indexRedirect()->with('success', 'Product removed successfully.');
         } catch(\Exception $e) {
-            return $this->indexRedirect->with('error', 'The product could not be removed. ' . $this->getError($e));
+            return $this->indexRedirect()->with('error', 'The product could not be removed. ' . $this->getError($e));
         }
     }
 
@@ -217,10 +241,13 @@ class ProductController extends Controller
     public function bulkDestroy(DestroyRequest $request)
     {
         try {
-            DB::table($this->tableName)->whereIn('uuid', $request->products_uuids)->delete();
-            return $this->indexRedirect->with('success', 'Products removed successfully.');
+            DB::table($this->tableName)
+                ->whereIn('uuid', $request->products_uuids)
+                ->delete();
+
+            return $this->indexRedirect()->with('success', 'Products removed successfully.');
         } catch (\Exception $e) {
-            return $this->indexRedirect->with('error', 'The products could not be removed. ' . $this->getError($e));
+            return $this->indexRedirect()->with('error', 'The products could not be removed. ' . $this->getError($e));
         }
     }
 }

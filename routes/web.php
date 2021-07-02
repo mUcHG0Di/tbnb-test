@@ -24,5 +24,5 @@ Route::patch('/products/update/multiple', [ProductController::class, 'bulkUpdate
     ->name('products.update.multiple');
 Route::delete('/products', [ProductController::class, 'bulkDestroy'])
     ->name('products.destroy.multiple');
-Route::resource('/products', ProductController::class);
+Route::resource('/products', ProductController::class)->parameter('product:id', 'product:uuid');
 

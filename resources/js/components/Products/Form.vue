@@ -1,21 +1,51 @@
 <template>
     <form @submit.prevent="store">
+        <v-row v-if="index > 0">
+            <v-spacer></v-spacer>
+
+
+            <v-tooltip
+                bottom
+              >
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                        class="mx-2"
+                        fab
+                        dark
+                        x-small
+                        color="red"
+                        v-on="on"
+                        @click="$emit('removeForm', index)"
+                    >
+                        <v-icon dark x-small>
+                            mdi-minus
+                        </v-icon>
+                    </v-btn>
+                </template>
+                Remove form product {{ form.name }}
+            </v-tooltip>
+        </v-row>
+
         <v-row>
             <v-col cols="12">
                 <v-text-field
                     label="Name: *"
                     v-model="form.name"
                     required
-                    :error="form.errors.name != null"
-                    :error-messages="form.errors.name"
+                    :disabled="busy"
+                    :error="errors[`products.${index}.name`] != null"
+                    :error-messages="errors[`products.${index}.name`]"
+                    @keyup="sync"
                 ></v-text-field>
             </v-col>
             <v-col cols="12">
                 <v-text-field
-                label="Description: "
-                v-model="form.description"
-                :error="form.errors.description != null"
-                :error-messages="form.errors.description"
+                    label="Description: "
+                    v-model="form.description"
+                    :disabled="busy"
+                    :error="errors[`products.${index}.description`] != null"
+                    :error-messages="errors[`products.${index}.description`]"
+                    @keyup="sync"
                 ></v-text-field>
             </v-col>
 
@@ -26,11 +56,16 @@
             >
                 <v-text-field
                     label="Price: *"
-                    type="number"
-                    v-model="form.price"
+                    v-model.number="form.price"
                     required
-                    :error="form.errors.price != null"
-                    :error-messages="form.errors.price"
+                    append-icon="mdi-plus"
+                    prepend-inner-icon="mdi-minus"
+                    :disabled="busy"
+                    :error="errors[`products.${index}.price`] != null"
+                    :error-messages="errors[`products.${index}.price`]"
+                    @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync"
+                    @click:prepend-inner="sub('price');"
+                    @click:append="add('price');"
                 ></v-text-field>
             </v-col>
             <v-col
@@ -40,11 +75,16 @@
             >
                 <v-text-field
                     label="Quantity: *"
-                    type="number"
-                    v-model="form.quantity"
+                    v-model.number="form.quantity"
                     required
-                    :error="form.errors.quantity != null"
-                    :error-messages="form.errors.quantity"
+                    append-icon="mdi-plus"
+                    prepend-inner-icon="mdi-minus"
+                    :disabled="busy"
+                    :error="errors[`products.${index}.quantity`] != null"
+                    :error-messages="errors[`products.${index}.quantity`]"
+                    @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync"
+                    @click:prepend-inner="sub('quantity');"
+                    @click:append="add('quantity');"
                 ></v-text-field>
             </v-col>
         </v-row>
@@ -56,7 +96,11 @@ export default {
     name: 'product-form',
     props: {
         product: Object,
+        index: Number,
+        errors: Object,
+        busy: Boolean,
     },
+    emits: ['syncForm', 'removeForm'],
 
     data: function() {
         return {
@@ -75,26 +119,37 @@ export default {
         this.formFill();
     },
 
+    watch: {
+        "product": function() {
+            Object.assign(this.form, this.product);
+        },
+    },
+
     methods: {
         formFill: function() {
             Object.assign(this.form, this.product);
         },
 
-        store: function() {
-            this.form.post(route('products.store'), {
-				preserveScroll: true,
-				onSuccess: () => { this.$emit('close'); },
-				onError: () => {},
-			});
+        sub: function(property) {
+            if (this.form[property] > 0) {
+                this.form[property] = parseInt(this.form[property], 10) - 1;
+                this.sync();
+            }
+        },
+        add: function(property) {
+            this.form[property] = parseInt(this.form[property], 10) + 1
+            this.sync();
         },
 
-        update: function() {
-            this.form.put(route('products.update'), {
-				preserveScroll: true,
-				onSuccess: () => { this.$emit('close'); },
-				onError: () => {},
-			});
-        }
+        sync: function() {
+            const {name, description, price, quantity} = this.form;
+            this.$emit('syncForm', {
+                name,
+                description,
+                price,
+                quantity,
+            });
+        },
     },
 }
 </script>
@@ -102,7 +157,6 @@ export default {
 <style>
 input[type="text"]:focus {
     border: none;
-    -tw-ring-color: rgba(255, 255, 255, 0);
 }
 
 .col {
