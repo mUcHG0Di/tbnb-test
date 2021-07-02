@@ -1,53 +1,17 @@
 <template>
     <app-layout>
         <v-container>
-            <!-- Header -->
-            <v-row>
-                <v-card-title>Products</v-card-title>
+            <!-- Actions -->
+            <TableActions
+                title="Products"
+                :selectedCount="bulkForm.products.length"
+                @show="showDialog = !showDialog"
+                @add="editMode = false; formDialog = !formDialog"
+                @edit="editMode = true; formDialog = !formDialog"
+                @destroy="destroy"
+            />
 
-                <v-spacer></v-spacer>
-
-                <v-btn
-                    elevation="1"
-                    color="primary"
-                    class="m-2"
-                    :disabled="bulkForm.products.length != 1"
-                    @click="showDialog = !showDialog"
-                >
-                    <v-icon small class="mr-1">mdi-eye</v-icon>
-                    Show
-                </v-btn>
-                <v-btn
-                    elevation="1"
-                    color="success"
-                    class="m-2"
-                    @click="editMode = false; formDialog = !formDialog"
-                >
-                    <v-icon small class="mr-1">mdi-plus</v-icon>
-                    Add
-                </v-btn>
-                <v-btn
-                    elevation="1"
-                    color="orange darken-2"
-                    class="m-2 white--text"
-                    :disabled="bulkForm.products.length <= 0"
-                    @click="editMode = true; formDialog = !formDialog"
-                >
-                    <v-icon small class="mr-1">mdi-pencil</v-icon>
-                    Update
-                </v-btn>
-                <v-btn
-                    elevation="1"
-                    color="error"
-                    class="m-2"
-                    :disabled="bulkForm.products.length <= 0"
-                    @click="destroy"
-                >
-                    <v-icon small class="mr-1">mdi-delete</v-icon>
-                    Delete
-                </v-btn>
-            </v-row>
-
+            <!-- Table -->
             <Table
                 :filters="queryBuilderProps.filters"
                 :search="queryBuilderProps.search"
@@ -92,12 +56,23 @@
             :selectedProducts="editMode ? bulkForm.products : [emptyProduct]"
             @close="formDialog = !formDialog; redirect();"
         />
+
+        <Show
+            v-if="showDialog"
+            :showing="showDialog"
+            :product="bulkForm.products[0]"
+            @close="showDialog = !showDialog"
+        />
+
+        <History />
     </app-layout>
 </template>
 
 
 <script>
     import AppLayout from '@/Layouts/AppLayout';
+    import TableActions from '@/Components/Common/TableActions';
+    import Show from './Show';
     import FormMultiple from './FormMultiple';
     import { InteractsWithQueryBuilder, Tailwind2 } from '@protonemedia/inertiajs-tables-laravel-query-builder';
 
@@ -105,11 +80,15 @@
         name: 'products-index',
         props: {
             products: Object,
-            formOpened: Boolean,
+            product: Object,
+            formDialogOpened: Boolean,
+            showDialogOpened: Boolean,
         },
         mixins: [ InteractsWithQueryBuilder ],
         components: {
             AppLayout,
+            TableActions,
+            Show,
             FormMultiple,
             Table: Tailwind2.Table,
         },
@@ -133,8 +112,12 @@
         },
 
         mounted: function() {
-            this.formDialog = this.formOpened;
+            this.formDialog = this.formDialogOpened;
             this.bulkForm.products = [];
+            if (this.showDialogOpened) {
+                this.showDialog = this.showDialogOpened;
+                this.bulkForm.products.push(this.products.data.filter((prod) => (prod.uuid == this.product.uuid))[0]);
+            }
         },
 
         methods: {

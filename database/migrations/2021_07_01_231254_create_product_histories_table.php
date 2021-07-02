@@ -15,8 +15,11 @@ class CreateProductHistoriesTable extends Migration
     {
         Schema::create('product_histories', function (Blueprint $table) {
             $table->id();
-            $table->string('product_uuid')->constrained('products', 'uuid')->cascadeOnDelete();
+            $table->uuid('product_uuid');
+            $table->integer('quantity');
             $table->timestamp('date');
+
+            $table->foreign('product_uuid')->references('uuid')->on('products')->onDelete('CASCADE');
         });
     }
 

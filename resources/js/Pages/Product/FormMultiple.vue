@@ -6,7 +6,7 @@
     >
         <v-card>
             <v-card-title>
-                <span class="text-h5">{{ title }}</span>
+                <span class="ml-2 text-h5">{{ title }}</span>
             </v-card-title>
             <v-card-text>
                     <v-container>
@@ -41,32 +41,21 @@
                     </v-container>
             </v-card-text>
 
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                    :disabled="processing"
-                    color="blue darken-1"
-                    text
-                    @click="close"
-                >
-                    Close
-                </v-btn>
-                <v-btn
-                    :loading="processing"
-                    :disabled="processing"
-                    color="blue darken-1"
-                    text
-                    @click="save"
-                >
-                    Save
-                </v-btn>
-            </v-card-actions>
+            <ModalActions
+                :editMode="true"
+                :processing="processing"
+                @close="close"
+                @cancel="close"
+                @save="save"
+                @editMode="(val) => { editMode = val; }"
+            />
         </v-card>
     </v-dialog>
 </template>
 
 <script>
 import ProductForm from '@/Components/Products/Form';
+import ModalActions from '@/Components/Common/ModalActions';
 
 export default {
     name: 'product-form',
@@ -85,6 +74,7 @@ export default {
     },
     components: {
         ProductForm,
+        ModalActions,
     },
 
     data: function() {

@@ -12,14 +12,14 @@
             >
 
                 <v-container>
-                    <v-toolbar-title class="px-3">TurnoverBnb</v-toolbar-title>
+                    <v-toolbar-title class="px-3">TurnoverBnb test</v-toolbar-title>
                 </v-container>
 
             </v-app-bar>
 
             <v-sheet
                 id="scrolling-techniques-7"
-                class="overflow-y-auto h-full"
+                class="h-full overflow-y-auto"
             >
                 <v-container style="padding-top: 15px; padding-bottom: 15px; height: 100%;">
                     <main>

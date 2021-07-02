@@ -6,10 +6,11 @@ use App\Models\Concerns\HasHistory;
 use App\Models\Concerns\UsesUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use \WF\Batch\Traits\Batchable;
 
 class Product extends Model
 {
-    use HasFactory, UsesUuid, HasHistory;
+    use HasFactory, UsesUuid, HasHistory, Batchable;
 
     /**
      * Mass assign attributes
@@ -17,7 +18,7 @@ class Product extends Model
      * @var string[]
      */
     protected $fillable = [
-        'name', 'description', 'price', 'quantity'
+        'uuid', 'name', 'description', 'price', 'quantity'
     ];
 
     /**

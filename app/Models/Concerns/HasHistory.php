@@ -2,16 +2,19 @@
 
 namespace App\Models\Concerns;
 
-use Illuminate\Support\Str;
-
 trait HasHistory {
 
     protected static function bootHasHistory()
     {
         static::saved(function ($model) {
-            $model->history()->create([
-                'date' => now()
-            ]);
+            // If it is created or the quantity was updated,
+            // save the histoty
+            if ($model->wasRecentlyCreated || $model->wasChanged('quantity')) {
+                $model->history()->create([
+                    'quantity' => $model->quantity,
+                    'date' => now(),
+                ]);
+            }
         });
     }
 

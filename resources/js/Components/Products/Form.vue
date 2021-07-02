@@ -3,7 +3,6 @@
         <v-row v-if="index > 0">
             <v-spacer></v-spacer>
 
-
             <v-tooltip
                 bottom
               >
@@ -33,8 +32,9 @@
                     v-model="form.name"
                     required
                     :disabled="busy"
-                    :error="errors[`products.${index}.name`] != null"
-                    :error-messages="errors[`products.${index}.name`]"
+                    :readonly="readonly"
+                    :error="errors[`products.${index}.name`] != null || errors['name'] != null"
+                    :error-messages="errors[`products.${index}.name`] || errors['name']"
                     @keyup="sync"
                 ></v-text-field>
             </v-col>
@@ -43,6 +43,7 @@
                     label="Description: "
                     v-model="form.description"
                     :disabled="busy"
+                    :readonly="readonly"
                     :error="errors[`products.${index}.description`] != null"
                     :error-messages="errors[`products.${index}.description`]"
                     @keyup="sync"
@@ -58,9 +59,10 @@
                     label="Price: *"
                     v-model.number="form.price"
                     required
-                    append-icon="mdi-plus"
-                    prepend-inner-icon="mdi-minus"
+                    :append-icon="(!readonly) ? 'mdi-plus' : null"
+                    :prepend-inner-icon="(!readonly) ? 'mdi-minus' : null"
                     :disabled="busy"
+                    :readonly="readonly"
                     :error="errors[`products.${index}.price`] != null"
                     :error-messages="errors[`products.${index}.price`]"
                     @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync"
@@ -77,9 +79,10 @@
                     label="Quantity: *"
                     v-model.number="form.quantity"
                     required
-                    append-icon="mdi-plus"
-                    prepend-inner-icon="mdi-minus"
+                    :append-icon="(!readonly) ? 'mdi-plus' : null"
+                    :prepend-inner-icon="(!readonly) ? 'mdi-minus' : null"
                     :disabled="busy"
+                    :readonly="readonly"
                     :error="errors[`products.${index}.quantity`] != null"
                     :error-messages="errors[`products.${index}.quantity`]"
                     @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync"
@@ -99,19 +102,18 @@ export default {
         index: Number,
         errors: Object,
         busy: Boolean,
+        readonly: Boolean,
     },
     emits: ['syncForm', 'removeForm'],
 
     data: function() {
         return {
-            form: this.$inertia.form({
+            form: {
 				name: null,
 				description: null,
                 price: 0,
                 quantity: 0,
-			}, {
-                resetOnSuccess : true,
-            }),
+			}
         };
     },
 
@@ -121,7 +123,7 @@ export default {
 
     watch: {
         "product": function() {
-            Object.assign(this.form, this.product);
+            this.formFill();
         },
     },
 
@@ -131,24 +133,20 @@ export default {
         },
 
         sub: function(property) {
+            if (this.readonly) return;
             if (this.form[property] > 0) {
                 this.form[property] = parseInt(this.form[property], 10) - 1;
                 this.sync();
             }
         },
         add: function(property) {
+            if (this.readonly) return;
             this.form[property] = parseInt(this.form[property], 10) + 1
             this.sync();
         },
 
         sync: function() {
-            const {name, description, price, quantity} = this.form;
-            this.$emit('syncForm', {
-                name,
-                description,
-                price,
-                quantity,
-            });
+            this.$emit('syncForm', this.form);
         },
     },
 }

@@ -18,13 +18,15 @@ class ProductControllerTest extends TestCase
     {
         $product = [
             'name' => null,
-            'description' => $this->faker->realText(),
+            'description' => $this->faker->realText(), // Text longer that 128 chars
             'price' => 'some price',
             'quantity' => 'some quantity',
         ];
-        $response = $this->post(route('products.store'), $product);
+        $response = $this->from(route('products.create'))
+                        ->post(route('products.store'), $product);
 
         $response->assertStatus(302)
+                ->assertRedirect(route('products.create'))
                 ->assertSessionHasErrors([
                     'name', 'description', 'price', 'quantity'
                 ]);
@@ -36,10 +38,11 @@ class ProductControllerTest extends TestCase
     public function it_stores_a_single_product()
     {
         $product = Product::factory()->make();
-        $response = $this->post(route('products.store'), $product->toArray());
+        $response = $this->from(route('products.create'))
+                        ->post(route('products.store'), $product->toArray());
 
-        $response->assertStatus(301)
-                ->assertRedirect(route('products.index'));
+        $response->assertRedirect(route('products.index'))
+                ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('products', [
             'name' => $product->name,
@@ -59,12 +62,14 @@ class ProductControllerTest extends TestCase
     {
         $products = [
             'products' => [
-                []
+                ['description' => $this->faker->realText()]
             ]
         ];
-        $response = $this->post(route('products.store.multiple'), $products);
+        $response = $this->from(route('products.create'))
+                        ->post(route('products.store.multiple'), $products);
 
         $response->assertStatus(302)
+                ->assertRedirect(route('products.create'))
                 ->assertSessionHasErrors([
                     'products.0.name', 'products.0.description', 'products.0.price', 'products.0.quantity'
                 ]);
@@ -75,13 +80,14 @@ class ProductControllerTest extends TestCase
      */
     public function it_stores_multiples_products()
     {
-        $this->withoutExceptionHandling();
         $products = Product::factory()->count(10)->make();
         $postData = array('products' => $products->toArray());
 
-        $response = $this->post(route('products.store.multiple'), $postData);
-        $response->assertStatus(301)
-                ->assertRedirect(route('products.index'));
+        $response = $this->from(route('products.create'))
+                        ->post(route('products.store.multiple'), $postData);
+
+        $response->assertRedirect(route('products.index'))
+                ->assertSessionHasNoErrors();
 
         $this->assertDatabaseCount('products', $products->count())
             ->assertDatabaseCount('product_histories', $products->count());
@@ -96,9 +102,11 @@ class ProductControllerTest extends TestCase
         $newName = 'Named edited';
         $product->name = $newName;
 
-        $response = $this->put(route('products.update', $product), $product->toArray());
-        $response->assertStatus(301)
-                ->assertRedirect(route('products.index'));
+        $response = $this->from(route('products.edit', $product))
+                        ->put(route('products.update', $product), $product->toArray());
+
+        $response->assertRedirect(route('products.index'))
+                ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('products', [
             'name' => $newName
@@ -111,18 +119,15 @@ class ProductControllerTest extends TestCase
     public function it_updates_multiple_products()
     {
         $products = Product::factory()->count(10)->create();
-        // $products->each(fn($product) => $product->name .= ' edited'); // Edit every model
-        $products->each(function($product) {
-            $product->name .= ' edited';
-            $product->setHidden(['uuid']);
-        });
+        $products->each(fn($product) => $product->name .= ' edited'); // Edit every model
         $postData = array('products' => $products->toArray());
 
         $response = $this->patch(route('products.update.multiple'), $postData);
-        $response->assertStatus(301)
-                ->assertRedirect(route('products.index'));
 
-        // $this->assertDatabaseCount('products', 10);
+        $response->assertRedirect(route('products.index'))
+                ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('products', 10);
         $products->each(function($product) {
             $product = $product->refresh();
             $this->assertDatabaseHas('products', $product->toArray());
@@ -137,8 +142,8 @@ class ProductControllerTest extends TestCase
         $product = Product::factory()->create();
 
         $response = $this->delete(route('products.destroy', $product));
-        $response->assertStatus(301)
-                ->assertRedirect(route('products.index'));
+        $response->assertRedirect(route('products.index'))
+                ->assertSessionHasNoErrors();
 
         $this->assertDeleted('products', $product->toArray());
     }
@@ -155,8 +160,8 @@ class ProductControllerTest extends TestCase
         ];
 
         $response = $this->delete(route('products.destroy.multiple'), $deleteData);
-        $response->assertStatus(301)
-                ->assertRedirect(route('products.index'));
+        $response->assertRedirect(route('products.index'))
+                ->assertSessionHasNoErrors();
 
         $this->assertDatabaseMissing('products', array_map(fn($uuid) => [$uuid => 'uuid'], $products_uuids));
     }

@@ -21,7 +21,7 @@ class ProductHistory extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['date'];
+    protected $fillable = ['quantity', 'date'];
 
     /**
      * Belongs to product relation
