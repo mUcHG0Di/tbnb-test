@@ -6,17 +6,19 @@
 
 require('./bootstrap');
 
-// import Vue from "vue";
+import _ from "lodash";
 import Vuetify from "vuetify";
 import { InertiaApp } from "@inertiajs/inertia-vue";
 import Swal from "sweetalert2";
 
 import "vuetify/dist/vuetify.min.css";
+import Vue from "vue";
 
 window.Vue = require('vue').default;
 
 Vue.use(InertiaApp);
 Vue.use(Vuetify);
+Vue.prototype.$_ = _;
 
 require("./filters");
 

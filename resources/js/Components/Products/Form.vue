@@ -1,11 +1,12 @@
 <template>
     <form @submit.prevent="store">
+        <!-- Button to remove form if is not the first one -->
         <v-row v-if="index > 0">
             <v-spacer></v-spacer>
 
             <v-tooltip
                 bottom
-              >
+            >
                 <template v-slot:activator="{ on }">
                     <v-btn
                         class="mx-2"
@@ -15,17 +16,21 @@
                         color="red"
                         v-on="on"
                         @click="$emit('removeForm', index)"
+                        @mouseenter="showBorder = true"
+                        @mouseleave="showBorder = false"
                     >
                         <v-icon dark x-small>
                             mdi-minus
                         </v-icon>
                     </v-btn>
                 </template>
-                Remove form product {{ form.name }}
+                Remove this form
             </v-tooltip>
         </v-row>
 
-        <v-row>
+        <v-row
+            :class="{'border-2 border-red-400': showBorder, 'border-2 border-transparent': !showBorder}"
+        >
             <v-col cols="12">
                 <v-text-field
                     label="Name: *"
@@ -65,7 +70,7 @@
                     :readonly="readonly"
                     :error="errors[`products.${index}.price`] != null"
                     :error-messages="errors[`products.${index}.price`]"
-                    @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync"
+                    @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync()"
                     @click:prepend-inner="sub('price');"
                     @click:append="add('price');"
                 ></v-text-field>
@@ -85,7 +90,7 @@
                     :readonly="readonly"
                     :error="errors[`products.${index}.quantity`] != null"
                     :error-messages="errors[`products.${index}.quantity`]"
-                    @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync"
+                    @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync()"
                     @click:prepend-inner="sub('quantity');"
                     @click:append="add('quantity');"
                 ></v-text-field>
@@ -99,7 +104,10 @@ export default {
     name: 'product-form',
     props: {
         product: Object,
-        index: Number,
+        index: {
+            type: Number,
+            default: () => 0,
+        },
         errors: Object,
         busy: Boolean,
         readonly: Boolean,
@@ -108,6 +116,7 @@ export default {
 
     data: function() {
         return {
+            showBorder: false,
             form: {
 				name: null,
 				description: null,
@@ -153,14 +162,13 @@ export default {
 </script>
 
 <style>
-input[type="text"]:focus {
-    border: none;
-}
-
 .col {
     padding-top: 0;
     padding-bottom: 0;
 }
+</style>
 
-
+<style lang="sass">
+input[type="text"]:focus
+    @apply focus:ring-0
 </style>

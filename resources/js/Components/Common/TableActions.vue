@@ -1,29 +1,9 @@
 <template>
     <v-row>
-        <v-card-title>{{ title }}</v-card-title>
+        <v-card-title class=" text-h5">{{ title }}</v-card-title>
 
         <v-spacer></v-spacer>
 
-        <v-btn
-            elevation="1"
-            color="primary"
-            class="m-2"
-            :disabled="selectedCount != 1"
-            @click="$emit('show')"
-        >
-            <v-icon small class="mr-1">mdi-eye</v-icon>
-            Show
-        </v-btn>
-        <v-btn
-            elevation="1"
-            color="cyan darken-1"
-            class="m-2 white--text"
-            :disabled="selectedCount != 1"
-            @click="$emit('history')"
-        >
-            <v-icon small class="mr-1">mdi-clipboard-list</v-icon>
-            History
-        </v-btn>
         <v-btn
             elevation="1"
             color="success"
@@ -52,6 +32,26 @@
         >
             <v-icon small class="mr-1">mdi-delete</v-icon>
             Delete
+        </v-btn>
+        <v-btn
+            elevation="1"
+            color="primary"
+            class="m-2"
+            :disabled="selectedCount != 1"
+            @click="$emit('show')"
+        >
+            <v-icon small class="mr-1">mdi-eye</v-icon>
+            Show
+        </v-btn>
+        <v-btn
+            elevation="1"
+            color="cyan darken-1"
+            class="m-2 white--text"
+            :disabled="selectedCount != 1"
+            @click="$emit('history')"
+        >
+            <v-icon small class="mr-1">mdi-clipboard-list</v-icon>
+            History
         </v-btn>
     </v-row>
 </template>

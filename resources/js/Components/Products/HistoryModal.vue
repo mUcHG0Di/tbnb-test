@@ -49,7 +49,6 @@
 
             <ModalActions
                 :editMode="false"
-                :actionable="false"
                 @close="$emit('close')"
             />
         </v-card>

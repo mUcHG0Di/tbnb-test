@@ -65,9 +65,9 @@ class ProductController extends Controller
                                 ->allowedSorts(array_keys($this->columns))
                                 ->allowedFilters([
                                     ...array_keys(Arr::except($this->columns, ['uuid', 'price', 'quantity'])),
-                                    AllowedFilter::exact('uuid'),
-                                    AllowedFilter::exact('price'),
-                                    AllowedFilter::exact('quantity'),
+                                    AllowedFilter::callback('uuid', fn($query, $value) => $query->where('uuid', 'LIKE', "%{$value}%")),
+                                    AllowedFilter::callback('price', fn($query, $value) => $query->where('price', 'LIKE', "%{$value}%")),
+                                    AllowedFilter::callback('quantity', fn($query, $value) => $query->where('uuid', 'LIKE', "%{$value}%")),
                                     $globalSearch
                                 ]);
 
@@ -86,7 +86,7 @@ class ProductController extends Controller
      */
     private function renderTable(InertiaTable $table) {
         $table->addSearchRows($this->columns)
-                ->addColumns(array_filter($this->columns, fn($value) => ($value != 'UUID')));
+                ->addColumns($this->columns);
     }
 
     /**
@@ -98,7 +98,7 @@ class ProductController extends Controller
     {
         $products = $this->getProducts();
 
-        return Inertia::render('Product/Index', compact('products'))
+        return Inertia::render('Products/Index', compact('products'))
                         ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 
@@ -110,9 +110,9 @@ class ProductController extends Controller
     public function create()
     {
         $products = $this->getProducts();
-        $formOpened = true;
+        $formDialogOpened = true;
 
-        return Inertia::render('Product/Index', compact('products', 'formOpened'))
+        return Inertia::render('Products/Index', compact('products', 'formDialogOpened'))
                         ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 
@@ -170,7 +170,7 @@ class ProductController extends Controller
         $products = $this->getProducts();
         $showDialogOpened = true;
 
-        return Inertia::render('Product/Index', compact('products', 'product', 'showDialogOpened'))
+        return Inertia::render('Products/Index', compact('products', 'product', 'showDialogOpened'))
                         ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 
@@ -186,7 +186,7 @@ class ProductController extends Controller
         $products = $this->getProducts($withHistory);
         $historyDialogOpened = true;
 
-        return Inertia::render('Product/Index', compact('products', 'product', 'historyDialogOpened'))
+        return Inertia::render('Products/Index', compact('products', 'product', 'historyDialogOpened'))
                         ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 
@@ -201,7 +201,7 @@ class ProductController extends Controller
         $products = $this->getProducts();
         $formOpened = true;
 
-        return Inertia::render('Product/Index', compact('products', 'formOpened', 'product'))
+        return Inertia::render('Products/Index', compact('products', 'formOpened', 'product'))
                         ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 

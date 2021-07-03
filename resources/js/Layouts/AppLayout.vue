@@ -12,7 +12,7 @@
             >
 
                 <v-container>
-                    <v-toolbar-title class="px-3">TurnoverBnb test</v-toolbar-title>
+                    <v-toolbar-title class="px-3">TurnoverBnB test</v-toolbar-title>
                 </v-container>
 
             </v-app-bar>

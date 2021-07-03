@@ -6,13 +6,12 @@
     >
         <v-card>
             <v-card-title>
-                <span class="mx-auto text-h5">{{ title }}</span>
+                <span class="mx-auto text-h6">{{ title }}</span>
             </v-card-title>
             <v-card-text>
                     <v-container>
                         <ProductForm
-                                :product="product"
-                                :index="0"
+                                :product="$_.pick(form, ['name', 'description', 'price', 'quantity'])"
                                 :busy="form.busy"
                                 :errors="form.errors ? form.errors : {}"
                                 :readonly="!editMode"
@@ -28,11 +27,12 @@
             <ModalActions
                 :editMode="editMode"
                 :processing="form.busy"
+                actionable
                 @close="close"
                 @cancel="() => { editMode = false; Object.assign(form, product) }"
                 @destroy="destroy"
                 @save="save"
-                @editMode="(val) => { editMode = val; }"
+                @editMode="(newEditModeVal) => { editMode = newEditModeVal; }"
             />
         </v-card>
     </v-dialog>
@@ -76,12 +76,6 @@ export default {
         },
     },
 
-    watch: {
-        "form.errors": function(newVal, oldVal) {
-            console.log(newVal);
-        },
-    },
-
     methods: {
         close: function() {
             this.form.clearErrors();
@@ -96,7 +90,6 @@ export default {
             this.form.put(route('products.update', this.form.uuid), {
 				preserveScroll: true,
 				onSuccess: () => { this.close(); },
-				onError: () => {},
                 onFinish: () => { this.processing = false; },
 			});
         },
@@ -106,7 +99,6 @@ export default {
             this.$root.confirmDestroy('Remove product', message, () => {
                 this.form.delete(route('products.destroy', this.form.uuid), {
                     onSuccess: () => { this.close(); },
-                    onError: () => {},
                 });
             })
         },
