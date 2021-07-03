@@ -1,7 +1,7 @@
 <template>
     <v-card-actions>
         <v-btn
-            v-if="!editMode"
+            v-if="!editMode && actionable"
             :disabled="processing"
             color="orange darken-1"
             text
@@ -12,7 +12,7 @@
         </v-btn>
 
         <v-btn
-            v-if="!editMode"
+            v-if="!editMode && actionable"
             :disabled="processing"
             color="red darken-1"
             text
@@ -58,6 +58,7 @@
 <script>
 export default {
     props: {
+        actionable: Boolean,
         editMode: Boolean,
         processing: Boolean,
     },

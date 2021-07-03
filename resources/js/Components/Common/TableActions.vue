@@ -16,6 +16,16 @@
         </v-btn>
         <v-btn
             elevation="1"
+            color="cyan darken-1"
+            class="m-2 white--text"
+            :disabled="selectedCount != 1"
+            @click="$emit('history')"
+        >
+            <v-icon small class="mr-1">mdi-clipboard-list</v-icon>
+            History
+        </v-btn>
+        <v-btn
+            elevation="1"
             color="success"
             class="m-2"
             @click="$emit('add')"

@@ -7,6 +7,7 @@ use App\Http\Requests\Product\DestroyRequest;
 use App\Http\Requests\Product\StoreUpdateRequest;
 use App\Http\Requests\Product\UpdateRequest;
 use App\Models\Product;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -50,28 +51,42 @@ class ProductController extends Controller
      *
      * @return LengthAwarePaginator
      */
-    private function getProducts(): LengthAwarePaginator
+    private function getProducts(bool $withHistory = false): LengthAwarePaginator
     {
         $globalSearch = AllowedFilter::callback('global', function ($query, $value) {
-            $query->where(function ($query) use ($value) {
-                $query->where('name', 'LIKE', "%{$value}%")
-                    ->orWhere('description', 'LIKE', "%{$value}%")
-                    ->orWhere('price', 'LIKE', "%{$value}%")
-                    ->orWhere('quantity', 'LIKE', "%{$value}%");
-            });
+            $query->where('name', 'LIKE', "%{$value}%")
+                ->orWhere('description', 'ILIKE', "%{$value}%")
+                ->orWhere('price', 'ILIKE', "%{$value}%")
+                ->orWhere('quantity', 'ILIKE', "%{$value}%");
         });
 
         $products = QueryBuilder::for(Product::class)
                                 ->defaultSort('name')
                                 ->allowedSorts(array_keys($this->columns))
                                 ->allowedFilters([
-                                    ...array_keys($this->columns),
+                                    ...array_keys(Arr::except($this->columns, ['uuid', 'price', 'quantity'])),
+                                    AllowedFilter::exact('uuid'),
+                                    AllowedFilter::exact('price'),
+                                    AllowedFilter::exact('quantity'),
                                     $globalSearch
-                                ])
-                                ->paginate()
-                                ->withQueryString();
+                                ]);
 
-        return $products;
+        if ($withHistory) {
+            $products = $products->with('history');
+        }
+
+        return $products->paginate()->withQueryString();
+    }
+
+    /**
+     * Callback to render the inertia table
+     *
+     * @param InertiaTable $table
+     * @return void
+     */
+    private function renderTable(InertiaTable $table) {
+        $table->addSearchRows($this->columns)
+                ->addColumns(array_filter($this->columns, fn($value) => ($value != 'UUID')));
     }
 
     /**
@@ -84,10 +99,7 @@ class ProductController extends Controller
         $products = $this->getProducts();
 
         return Inertia::render('Product/Index', compact('products'))
-                        ->table(function (InertiaTable $table) {
-                            $table->addSearchRows($this->columns)
-                                    ->addColumns(array_filter($this->columns, fn($value) => ($value != 'UUID')));
-                        });
+                        ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 
     /**
@@ -101,10 +113,7 @@ class ProductController extends Controller
         $formOpened = true;
 
         return Inertia::render('Product/Index', compact('products', 'formOpened'))
-                        ->table(function (InertiaTable $table) {
-                            $table->addSearchRows($this->columns)
-                                    ->addColumns(array_filter($this->columns, fn($value) => ($value != 'UUID')));
-                        });
+                        ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 
     /**
@@ -162,10 +171,23 @@ class ProductController extends Controller
         $showDialogOpened = true;
 
         return Inertia::render('Product/Index', compact('products', 'product', 'showDialogOpened'))
-                        ->table(function (InertiaTable $table) {
-                            $table->addSearchRows($this->columns)
-                                    ->addColumns(array_filter($this->columns, fn($value) => ($value != 'UUID')));
-                        });
+                        ->table(fn(InertiaTable $table) => $this->renderTable($table));
+    }
+
+    /**
+     * Show the resource history
+     *
+     * @param Product $product
+     * @return Illuminate\Http\Response
+     */
+    public function showHistory(Product $product)
+    {
+        $withHistory = true;
+        $products = $this->getProducts($withHistory);
+        $historyDialogOpened = true;
+
+        return Inertia::render('Product/Index', compact('products', 'product', 'historyDialogOpened'))
+                        ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 
     /**
@@ -180,10 +202,7 @@ class ProductController extends Controller
         $formOpened = true;
 
         return Inertia::render('Product/Index', compact('products', 'formOpened', 'product'))
-                        ->table(function (InertiaTable $table) {
-                            $table->addSearchRows($this->columns)
-                                    ->addColumns(array_filter($this->columns, fn($value) => ($value != 'UUID')));
-                        });
+                        ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 
     /**
@@ -213,13 +232,13 @@ class ProductController extends Controller
     {
         DB::beginTransaction();
         try {
-            // For the bulk update to work with update event creategin the history
+            // For the bulk update to work with "updated" event creating the history
             // if quantity value was updated, we need the real models (The batch update execute
             // one query for each row)
             $products = Product::whereIn('uuid', array_map(fn($product) => $product['uuid'], $request->products))->get();
             $products->each(function($product) use($request) {
                 foreach ($request->products as $productData) {
-                    $product->fill($productData);
+                    if ($productData['uuid'] == $product->uuid) $product->fill($productData);
                 }
             });
 
@@ -266,6 +285,22 @@ class ProductController extends Controller
             return redirect()->route('products.index')->with('success', 'Products removed successfully.');
         } catch (\Exception $e) {
             return redirect()->route('products.index', [], 302)->with('error', 'The products could not be removed. ' . $this->getError($e));
+        }
+    }
+
+    public function getHistory(Product $product)
+    {
+        try {
+            return [
+                'status' => 'success',
+                'message' => 'History retrieved successfully',
+                'data' => $product->history
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'History could not be retrieved. ' . $this->getError($e)
+            ];
         }
     }
 }

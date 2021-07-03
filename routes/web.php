@@ -24,5 +24,11 @@ Route::patch('/products/update/multiple', [ProductController::class, 'bulkUpdate
     ->name('products.update.multiple');
 Route::delete('/products', [ProductController::class, 'bulkDestroy'])
     ->name('products.destroy.multiple');
-Route::resource('/products', ProductController::class)->parameter('product:id', 'product:uuid');
+Route::get('/products/{product}/history', [ProductController::class, 'showHistory'])
+    ->name('products.history');
+Route::resource('/products', ProductController::class); //->parameter('product:id', 'product:uuid');
+
+// Ajax request
+Route::get('/products/{product}/get-history', [ProductController::class, 'getHistory'])
+    ->name('products.history.get');
 
