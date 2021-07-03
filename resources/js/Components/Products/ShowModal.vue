@@ -10,7 +10,7 @@
             </v-card-title>
             <v-card-text>
                     <v-container>
-                        <img :src="product.image_path" class="w-3/5 h-auto mx-auto mb-7" />
+                        <img :src="product.image_url" class="w-3/5 h-auto mx-auto mb-7" />
 
                         <ProductForm
                                 :product="$_.pick(form, ['name', 'description', 'price', 'quantity'])"

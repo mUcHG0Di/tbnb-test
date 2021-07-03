@@ -1,5 +1,5 @@
 <template>
-    <div class="grid flex-wrap grid-cols-2 w-52">
+    <div class="grid flex-wrap grid-cols-2 mx-auto w-52">
         <v-btn
             x-small
             elevation="1"
