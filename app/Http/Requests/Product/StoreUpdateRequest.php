@@ -23,11 +23,19 @@ class StoreUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'name' => ['required', 'max:64'],
             'description' => ['max:128'],
             'price' => ['required', 'numeric', 'min:1'],
             'quantity' => ['required', 'numeric', 'min:1'],
+            'image' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
+
+        // If it's an update, image is not required
+        $isUpdate = in_array($this->method(), ['PUT', 'PATCH']);
+        $newImageRule = ($isUpdate) ? 'nullable' : 'required';
+        array_push($rules['image'], $newImageRule);
+
+        return $rules;
     }
 }

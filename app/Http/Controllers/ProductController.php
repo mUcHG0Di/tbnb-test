@@ -125,8 +125,13 @@ class ProductController extends Controller
     public function store(StoreUpdateRequest $request)
     {
         try {
-            Product::create($request->all());
-            return redirect()->route('products.index')->with('success', 'Product created successfully!');
+            $filename = $request->file('image')->getClientOriginalName();
+            $path = $request->file('image')->storeAs('images/products', $filename);
+            $productData = $request->all();
+            $productData['image'] = $path;
+            Product::create($productData);
+
+            return redirect()->route('products.index')->with('success', 'Product created!');
         } catch (\Exception $e) {
             return redirect()->route('products.index', [], 302)->with('error', 'Product could not be created. ' . $this->getError($e));
         }
@@ -151,11 +156,10 @@ class ProductController extends Controller
             Product::newBatch($products)->save()->now();
 
             DB::commit();
-            return redirect()->route('products.index')->with('success', 'Products saved successfully.');
+            return redirect()->route('products.index')->with('success', 'Products created.');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd("Error bulk");
-            return redirect()->route('products.index', [], 302)->with('error', 'Products could not be saved. ' . $this->getError($e));
+            return redirect()->route('products.index', [], 302)->with('error', 'Products could not be created. ' . $this->getError($e));
         }
     }
 
@@ -216,7 +220,7 @@ class ProductController extends Controller
     {
         try {
             $product->update($request->all());
-            return redirect()->route('products.index')->with('success', 'Product updated successfully!');
+            return redirect()->route('products.index')->with('success', 'Product updated!');
         } catch (\Exception $e) {
             return redirect()->route('products.index', [], 302)->with('error', 'Product could not be created. ' . $this->getError($e));
         }
@@ -246,7 +250,7 @@ class ProductController extends Controller
             Product::newBatch($products)->save()->now();
 
             DB::commit();
-            return redirect()->route('products.index')->with('success', 'Products saved successfully.');
+            return redirect()->route('products.index')->with('success', 'Products saved.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('products.index', [], 302)->with('error', 'Products could not be saved. ' . $this->getError($e));
@@ -263,7 +267,7 @@ class ProductController extends Controller
     {
         try {
             $product->delete();
-            return redirect()->route('products.index')->with('success', 'Product removed successfully.');
+            return redirect()->route('products.index')->with('success', 'Product removed.');
         } catch(\Exception $e) {
             return redirect()->route('products.index', [], 302)->with('error', 'The product could not be removed. ' . $this->getError($e));
         }
@@ -282,7 +286,7 @@ class ProductController extends Controller
                 ->whereIn('uuid', $request->products_uuids)
                 ->delete();
 
-            return redirect()->route('products.index')->with('success', 'Products removed successfully.');
+            return redirect()->route('products.index')->with('success', 'Products removed.');
         } catch (\Exception $e) {
             return redirect()->route('products.index', [], 302)->with('error', 'The products could not be removed. ' . $this->getError($e));
         }
@@ -293,7 +297,7 @@ class ProductController extends Controller
         try {
             return [
                 'status' => 'success',
-                'message' => 'History retrieved successfully',
+                'message' => 'History retrieved',
                 'data' => $product->history
             ];
         } catch (\Exception $e) {

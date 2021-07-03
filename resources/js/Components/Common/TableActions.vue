@@ -10,8 +10,17 @@
             class="m-2"
             @click="$emit('add')"
         >
-            <v-icon small class="mr-1">mdi-plus</v-icon>
+            <v-icon small class="mr-1">mdi-plus-box-outline</v-icon>
             Add
+        </v-btn>
+        <v-btn
+            elevation="1"
+            color="success"
+            class="m-2"
+            @click="$emit('addMultiple')"
+        >
+            <v-icon small class="mr-1">mdi-plus-box-multiple-outline</v-icon>
+            Bulk add
         </v-btn>
         <v-btn
             elevation="1"
@@ -20,8 +29,8 @@
             :disabled="selectedCount <= 0"
             @click="$emit('edit')"
         >
-            <v-icon small class="mr-1">mdi-pencil</v-icon>
-            Update
+            <v-icon small class="mr-1">mdi-square-edit-outline</v-icon>
+            Bulk update
         </v-btn>
         <v-btn
             elevation="1"
@@ -30,28 +39,8 @@
             :disabled="selectedCount <= 0"
             @click="$emit('destroy')"
         >
-            <v-icon small class="mr-1">mdi-delete</v-icon>
-            Delete
-        </v-btn>
-        <v-btn
-            elevation="1"
-            color="primary"
-            class="m-2"
-            :disabled="selectedCount != 1"
-            @click="$emit('show')"
-        >
-            <v-icon small class="mr-1">mdi-eye</v-icon>
-            Show
-        </v-btn>
-        <v-btn
-            elevation="1"
-            color="cyan darken-1"
-            class="m-2 white--text"
-            :disabled="selectedCount != 1"
-            @click="$emit('history')"
-        >
-            <v-icon small class="mr-1">mdi-clipboard-list</v-icon>
-            History
+            <v-icon small class="mr-1">mdi-delete-sweep-outline</v-icon>
+            Bulk delete
         </v-btn>
     </v-row>
 </template>

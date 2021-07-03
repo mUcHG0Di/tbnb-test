@@ -5,6 +5,8 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProductControllerTest extends TestCase
@@ -21,6 +23,7 @@ class ProductControllerTest extends TestCase
             'description' => $this->faker->realText(), // Text longer that 128 chars
             'price' => 'some price',
             'quantity' => 'some quantity',
+            'image' => null,
         ];
         $response = $this->from(route('products.create'))
                         ->post(route('products.store'), $product);
@@ -28,7 +31,7 @@ class ProductControllerTest extends TestCase
         $response->assertStatus(302)
                 ->assertRedirect(route('products.create'))
                 ->assertSessionHasErrors([
-                    'name', 'description', 'price', 'quantity'
+                    'name', 'description', 'price', 'quantity', 'image'
                 ]);
     }
 
@@ -37,12 +40,16 @@ class ProductControllerTest extends TestCase
      */
     public function it_stores_a_single_product()
     {
+        Storage::fake();
         $product = Product::factory()->make();
+        $product->image = UploadedFile::fake()->image('product.jpg');
         $response = $this->from(route('products.create'))
                         ->post(route('products.store'), $product->toArray());
 
         $response->assertRedirect(route('products.index'))
                 ->assertSessionHasNoErrors();
+
+        Storage::assertExists('images/products/product.jpg');
 
         $this->assertDatabaseHas('products', [
             'name' => $product->name,
@@ -119,7 +126,7 @@ class ProductControllerTest extends TestCase
     public function it_updates_multiple_products()
     {
         $products = Product::factory()->count(10)->create();
-        $products->each(fn($product) => $product->name .= ' edited'); // Edit every model
+        $products->each(fn($product) => $product->setHidden(['image_url'])->name .= ' edited'); // Edit every model
         $postData = array('products' => $products->toArray());
 
         $response = $this->patch(route('products.update.multiple'), $postData);
@@ -145,7 +152,7 @@ class ProductControllerTest extends TestCase
         $response->assertRedirect(route('products.index'))
                 ->assertSessionHasNoErrors();
 
-        $this->assertDeleted('products', $product->toArray());
+        $this->assertDeleted('products', $product->setHidden(['image_url'])->toArray());
     }
 
     /**
@@ -163,6 +170,7 @@ class ProductControllerTest extends TestCase
         $response->assertRedirect(route('products.index'))
                 ->assertSessionHasNoErrors();
 
+        // map uuids to check if missing in database
         $this->assertDatabaseMissing('products', array_map(fn($uuid) => [$uuid => 'uuid'], $products_uuids));
     }
 }

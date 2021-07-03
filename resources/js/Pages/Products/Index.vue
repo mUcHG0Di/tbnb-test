@@ -5,11 +5,10 @@
             <TableActions
                 title="Products"
                 :selectedCount="bulkForm.products.length"
-                @show="showDialog = !showDialog"
-                @history="historyDialog = !historyDialog"
-                @add="editMode = false; formDialog = true"
-                @edit="editMode = true; formDialog = true"
-                @destroy="destroy"
+                @add="editMode = false; singleMode = formDialog = true;"
+                @addMultiple="editMode = singleMode = false; formDialog = true;"
+                @edit="editMode = formDialog = true; singleMode = false;"
+                @destroy="destroyMultiple"
             />
 
             <!-- Table -->
@@ -28,6 +27,7 @@
                         <th v-show="showColumn('description')" @click.prevent="sortBy('description')">Description</th>
                         <th v-show="showColumn('price')" @click.prevent="sortBy('price')">Price</th>
                         <th v-show="showColumn('quantity')" @click.prevent="sortBy('quantity')">Quantity</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </template>
 
@@ -41,11 +41,21 @@
                                 light
                             ></v-checkbox>
                         </td>
-                        <td v-show="showColumn('uuid')">{{ product.uuid }}</td>
+                        <td v-show="showColumn('uuid')">
+                            <div class="break-words whitespace-normal w-36">{{ product.uuid }}</div>
+                        </td>
                         <td v-show="showColumn('name')">{{ product.name }}</td>
                         <td v-show="showColumn('description')">{{ product.description }}</td>
                         <td v-show="showColumn('price')">{{ product.price }}</td>
                         <td v-show="showColumn('quantity')">{{ product.quantity }}</td>
+                        <td>
+                            <RowActions
+                                @show="() => { bulkForm.products = [product.uuid]; showDialog = true; }"
+                                @history="() => { bulkForm.products = [product.uuid]; historyDialog = true; }"
+                                @edit="() => { bulkForm.products = [product.uuid]; formDialog = editMode = singleMode = true; }"
+                                @destroy="() => { destroySingle(product) }"
+                            />
+                        </td>
                     </tr>
                 </template>
             </Table>
@@ -55,6 +65,7 @@
         <FormModal
             v-if="formDialog"
             :showing="formDialog"
+            :single="singleMode"
             :selectedProducts="editMode ? $_.filter(products.data, (product) => bulkForm.products.includes(product.uuid)) : [getEmptyProduct()]"
             @close="formDialog = false;"
         />
@@ -69,7 +80,7 @@
         <HistoryModal
             v-if="historyDialog"
             :showing="historyDialog"
-            :product="products.data.find((product) => product.uuid ==  $._first(bulkForm.products))"
+            :product="products.data.find((product) => product.uuid ==  $_.first(bulkForm.products))"
             @close="historyDialog = false"
         />
     </app-layout>
@@ -79,6 +90,7 @@
 <script>
     import AppLayout from '@/Layouts/AppLayout';
     import TableActions from '@/Components/Common/TableActions';
+    import RowActions from '@/Components/Common/RowActions';
     import ShowModal from '@/Components/Products/ShowModal';
     import FormModal from '@/Components/Products/FormModal';
     import HistoryModal from '@/Components/Products/HistoryModal';
@@ -97,6 +109,7 @@
         components: {
             AppLayout,
             TableActions,
+            RowActions,
             ShowModal,
             FormModal,
             HistoryModal,
@@ -105,10 +118,15 @@
 
         data: function() {
             return {
+                // Dialogs
                 showDialog: false,
                 formDialog: false,
                 historyDialog: false,
+
+                // Form modes
+                singleMode: false,
                 editMode: false,
+
                 bulkForm: this.$inertia.form({
                     products: [],
                 }, {
@@ -137,9 +155,27 @@
                 }
             },
 
-            destroy: function() {
+            destroySingle: function(product) {
+                const title = 'Remove product';
+                const message = `Are you sure you want to remove the product "${product.name}?"`;
+                this.$root.confirmDestroy(title, message, () => {
+                    this.bulkForm.transform((data) => ({
+                        products_uuids: data.products,
+                    }))
+                    .delete(route('products.destroy', product.uuid), {
+                        onSuccess: () => {
+                            this.bulkForm.products = [];
+                            this.redirect();
+                        },
+                        onError: () => {},
+                    });
+                });
+            },
+
+            destroyMultiple: function() {
+                const title = 'Remove products';
                 const message = this.getFormattedMessage();
-                this.$root.confirmDestroy('Remove products', message, () => {
+                this.$root.confirmDestroy(title, message, () => {
                     this.bulkForm.transform((data) => ({
                         products_uuids: data.products,
                     }))
@@ -150,7 +186,7 @@
                         },
                         onError: () => {},
                     });
-                })
+                });
             },
 
             getFormattedMessage: function() {

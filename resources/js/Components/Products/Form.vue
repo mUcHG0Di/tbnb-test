@@ -33,7 +33,7 @@
         >
             <v-col cols="12">
                 <v-text-field
-                    label="Name: *"
+                    :label="`Name: ${(!readonly) ? '*' : ''}`"
                     v-model="form.name"
                     required
                     :disabled="busy"
@@ -49,8 +49,8 @@
                     v-model="form.description"
                     :disabled="busy"
                     :readonly="readonly"
-                    :error="errors[`products.${index}.description`] != null"
-                    :error-messages="errors[`products.${index}.description`]"
+                    :error="errors[`products.${index}.description`] != null || errors['description'] != null"
+                    :error-messages="errors[`products.${index}.description`] || errors['description']"
                     @keyup="sync"
                 ></v-text-field>
             </v-col>
@@ -61,15 +61,15 @@
                 md="6"
             >
                 <v-text-field
-                    label="Price: *"
+                    :label="`Price: ${(!readonly) ? '*' : ''}`"
                     v-model.number="form.price"
                     required
                     :append-icon="(!readonly) ? 'mdi-plus' : null"
                     :prepend-inner-icon="(!readonly) ? 'mdi-minus' : null"
                     :disabled="busy"
                     :readonly="readonly"
-                    :error="errors[`products.${index}.price`] != null"
-                    :error-messages="errors[`products.${index}.price`]"
+                    :error="errors[`products.${index}.price`] != null || errors['price'] != null"
+                    :error-messages="errors[`products.${index}.price`] || errors['price']"
                     @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync()"
                     @click:prepend-inner="sub('price');"
                     @click:append="add('price');"
@@ -81,19 +81,47 @@
                 md="6"
             >
                 <v-text-field
-                    label="Quantity: *"
+                    :label="`Quantity: ${(!readonly) ? '*' : ''}`"
                     v-model.number="form.quantity"
                     required
                     :append-icon="(!readonly) ? 'mdi-plus' : null"
                     :prepend-inner-icon="(!readonly) ? 'mdi-minus' : null"
                     :disabled="busy"
                     :readonly="readonly"
-                    :error="errors[`products.${index}.quantity`] != null"
-                    :error-messages="errors[`products.${index}.quantity`]"
+                    :error="errors[`products.${index}.quantity`] != null || errors['quantity'] != null"
+                    :error-messages="errors[`products.${index}.quantity`] || errors['quantity']"
                     @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync()"
                     @click:prepend-inner="sub('quantity');"
                     @click:append="add('quantity');"
                 ></v-text-field>
+            </v-col>
+
+            <v-col
+                v-if="requiresImage"
+                cols="12"
+            >
+                <v-file-input
+                    v-model="form.image"
+                    show-size
+                    accept="image/*"
+                    :label="`Product image: ${(!readonly) ? '*' : ''}`"
+                    :error="errors[`products.${index}.image`] != null || errors['image'] != null"
+                    :error-messages="errors[`products.${index}.image`] || errors['image']"
+                ></v-file-input>
+
+                <div
+                    v-if="imageSelected"
+                    class="w-full"
+                >
+                    <h3 class="mb-5">Image selected:</h3>
+
+                    <img
+                        :src="imageSelected"
+                        alt="Selected image"
+                        title="Selected image"
+                        class="w-3/5 h-auto mx-auto"
+                    >
+                </div>
             </v-col>
         </v-row>
     </form>
@@ -111,17 +139,20 @@ export default {
         errors: Object,
         busy: Boolean,
         readonly: Boolean,
+        requiresImage: Boolean,
     },
     emits: ['syncForm', 'removeForm'],
 
     data: function() {
         return {
             showBorder: false,
+            imageSelected: null,
             form: {
 				name: null,
 				description: null,
                 price: 0,
                 quantity: 0,
+                image: null,
 			}
         };
     },
@@ -133,6 +164,15 @@ export default {
     watch: {
         "product": function() {
             this.formFill();
+        },
+        "form.image": function(newVal, oldVal) {
+            if (newVal == null) {
+                this.imageSelected = null;
+            } else {
+                this.imageSelected = URL.createObjectURL(newVal) || null;
+            }
+
+            this.sync();
         },
     },
 

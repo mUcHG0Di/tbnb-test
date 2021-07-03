@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect()->route('productos.index');
+    return redirect()->route('products.index');
 });
 
 Route::post('/products/store/multiple', [ProductController::class, 'bulkStore'])
