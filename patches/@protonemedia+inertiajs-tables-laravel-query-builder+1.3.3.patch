@@ -1,3 +1,25 @@
+diff --git a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/Table.vue b/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/Table.vue
+index 7281dbf..bf8d1bd 100644
+--- a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/Table.vue
++++ b/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/Table.vue
+@@ -37,7 +37,7 @@ table >>> tr:hover td {
+ </style>
+ 
+ <template>
+-  <div>
++  <div class="p-2 shadow">
+     <div class="flex space-x-4">
+       <slot
+         name="tableFilter"
+@@ -108,7 +108,7 @@ table >>> tr:hover td {
+     <slot name="tableWrapper" :meta="meta">
+       <TableWrapper :class="{'mt-2': !onlyData}">
+         <slot name="table">
+-          <table class="min-w-full divide-y divide-gray-200 bg-white">
++          <table class="min-w-full bg-white divide-y divide-gray-200">
+             <thead class="bg-gray-50">
+               <slot name="head" />
+             </thead>
 diff --git a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue b/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue
 index 55321c0..d853465 100644
 --- a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue
