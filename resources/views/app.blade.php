@@ -14,7 +14,7 @@
         <link href="{{ mix('/css/app.css') }}" rel="stylesheet" />
 
         @routes
-        <script src="{{ mix('/js/app.js') }}" defer></script>
+        <script src="{{ mix('/js/app.js') }}?version={{ env('JS_VERSION') }}" defer></script>
     </head>
     <body class="font-sans antialiased">
         @inertia

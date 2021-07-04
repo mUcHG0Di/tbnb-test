@@ -143,9 +143,18 @@
                 this.historyDialog = this.historyDialogOpened;
                 this.bulkForm.products.push(this.products.data.filter((prod) => (prod.uuid == this.product.uuid))[0]);
             }
+
+            this.configDatatable();
         },
 
         methods: {
+            configDatatable: function() {
+                // Move navigation buttons to improve mobile layout
+                const nav = document.querySelector('.bg-white.px-4.py-3');
+                nav.parentNode.parentNode.parentNode.parentNode.parentNode.append(nav);
+                nav.classList.add('mt-3');
+            },
+
             getEmptyProduct: function() {
                 return {
                     name: null,

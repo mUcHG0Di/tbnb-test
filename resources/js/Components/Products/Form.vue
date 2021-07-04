@@ -178,7 +178,8 @@ export default {
 
     methods: {
         formFill: function() {
-            Object.assign(this.form, this.product);
+            // Assign values, except for image
+            Object.assign(this.form, this.$_.pick(this.product, ['name', 'description', 'price', 'quantity']));
         },
 
         sub: function(property) {

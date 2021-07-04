@@ -1,0 +1,17 @@
+diff --git a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue b/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue
+index 55321c0..d853465 100644
+--- a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue
++++ b/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue
+@@ -1,8 +1,8 @@
+ <template>
+-  <div class="flex flex-col">
+-    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+-      <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+-        <div class="shadow border-b border-gray-200 relative">
++  <div class="flex flex-col overflow-x-auto overflow-y-hidden">
++    <div class="-my-2 sm:-mx-6 lg:-mx-8">
++      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
++        <div class="relative border-b border-gray-200">
+           <slot />
+         </div>
+       </div>

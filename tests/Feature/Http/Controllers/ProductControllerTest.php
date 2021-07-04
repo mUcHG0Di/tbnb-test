@@ -88,6 +88,7 @@ class ProductControllerTest extends TestCase
     public function it_stores_multiples_products()
     {
         $products = Product::factory()->count(10)->make();
+        $products->each(fn($product) => $product->setHidden(['image_url']));
         $postData = array('products' => $products->toArray());
 
         $response = $this->from(route('products.create'))

@@ -49,6 +49,7 @@ class ProductController extends Controller
      * Get products paginated for
      * the InertiaTable
      *
+     * @param bool $withHistory In case we need to get the history relationship
      * @return LengthAwarePaginator
      */
     private function getProducts(bool $withHistory = false): LengthAwarePaginator
@@ -147,13 +148,8 @@ class ProductController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Add UUID to each product
-            $products = array_map(fn($product) =>
-                        Product::make($product)->setAttribute('uuid', Str::uuid()),
-                    $request->products);
-
             // Batch insert of products with event triggering
-            Product::newBatch($products)->save()->now();
+            Product::newBatch($request->products)->save()->now();
 
             DB::commit();
             return redirect()->route('products.index')->with('success', 'Products created.');
@@ -237,13 +233,11 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             // For the bulk update to work with "updated" event creating the history
-            // if quantity value was updated, we need the real models (The batch update execute
-            // one query for each row)
+            // if quantity value was updated, we need them to be model instances
             $products = Product::whereIn('uuid', array_map(fn($product) => $product['uuid'], $request->products))->get();
             $products->each(function($product) use($request) {
-                foreach ($request->products as $productData) {
-                    if ($productData['uuid'] == $product->uuid) $product->fill($productData);
-                }
+                $matchingProduct = Arr::first($request->products, fn($reqProduct) => $reqProduct['uuid'] == $product->uuid);
+                if ($matchingProduct) $product->fill($matchingProduct);
             });
 
             // Batch update of products with event triggering
@@ -281,13 +275,16 @@ class ProductController extends Controller
      */
     public function bulkDestroy(DestroyRequest $request)
     {
+        DB::beginTransaction();
         try {
             DB::table($this->tableName)
                 ->whereIn('uuid', $request->products_uuids)
                 ->delete();
+            DB::commit();
 
             return redirect()->route('products.index')->with('success', 'Products removed.');
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->route('products.index', [], 302)->with('error', 'The products could not be removed. ' . $this->getError($e));
         }
     }
