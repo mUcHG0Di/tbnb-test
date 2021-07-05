@@ -13,7 +13,7 @@
                         <img :src="product.image_url" class="w-3/5 h-auto mx-auto mb-7" />
 
                         <ProductForm
-                                :product="$_.pick(form, ['name', 'description', 'price', 'quantity'])"
+                                :product="$_.pick(form, ['name', 'description', 'price', 'quantity', 'owner'])"
                                 :busy="form.busy"
                                 :errors="form.errors ? form.errors : {}"
                                 :readonly="!editMode"
@@ -64,6 +64,7 @@ export default {
                 description: null,
                 price: 0,
                 quantity: 0,
+                owner: null,
             }),
         };
     },

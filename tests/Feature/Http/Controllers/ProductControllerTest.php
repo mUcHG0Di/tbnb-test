@@ -3,9 +3,12 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\User;
+use App\Notifications\ProductQuantityUpdated;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -55,12 +58,12 @@ class ProductControllerTest extends TestCase
     /** @test */
     public function it_updates_a_single_product()
     {
-        $product = Product::factory()->create();
+        $this->product->save();
         $newName = 'Named edited';
         $this->product->name = $newName;
 
-        $response = $this->from(route('products.edit', $product))
-                        ->put(route('products.update', $product), $this->product->toArray());
+        $response = $this->from(route('products.edit', $this->product))
+                        ->put(route('products.update', $this->product), $this->product->toArray());
 
         $response->assertRedirect(route('products.index'))
                 ->assertSessionHasNoErrors();
@@ -68,6 +71,31 @@ class ProductControllerTest extends TestCase
         $this->assertDatabaseHas('products', [
             'name' => $newName
         ]);
+    }
+
+    /** @test */
+    public function it_notifies_the_owner_if_the_quantity_was_updated_by_someone_else()
+    {
+        Notification::fake();
+
+        // Assert that no notifications were sent...
+        Notification::assertNothingSent();
+
+        $this->product = Product::factory()->create();
+        $this->product->quantity = 14;
+
+        $this->from(route('products.edit', $this->product))
+                ->put(route('products.update', $this->product), $this->product->toArray());
+
+        $product = $this->product->refresh();
+
+        // Assert a specific type of notification was sent meeting the given truth test...
+        Notification::assertSentTo(
+            $product->owner,
+            function (ProductQuantityUpdated $notification, $channels) use ($product) {
+                return $notification->product->uuid === $product->id && $notification->product->quantity !== $product->quantity;
+            }
+        );
     }
 
     /** @test */

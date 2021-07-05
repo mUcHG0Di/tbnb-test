@@ -19,7 +19,7 @@ require __DIR__.'/auth.php';
 
 Route::get('/', function () {
     return redirect()->route('products.index');
-});
+})->name('home');
 
 Route::group(['middleware' => ['web', 'auth']], function() {
     Route::post('/products/store/multiple', [ProductController::class, 'bulkStore'])

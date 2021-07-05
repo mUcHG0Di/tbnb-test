@@ -10,6 +10,12 @@ class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        auth()->logout();
+    }
+
     public function test_registration_screen_can_be_rendered()
     {
         $response = $this->get('/register');

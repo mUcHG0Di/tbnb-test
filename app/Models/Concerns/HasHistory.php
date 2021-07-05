@@ -13,6 +13,7 @@ trait HasHistory {
                 $model->history()->create([
                     'quantity' => $model->quantity,
                     'date' => now(),
+                    'user_id' => auth()->user()->id,
                 ]);
             }
         });

@@ -41,6 +41,7 @@ class ProductController extends Controller
             'description' => 'Description',
             'price' => 'Price',
             'quantity' => 'Quantity',
+            'owner.name' => 'Owner',
         ];
     }
 
@@ -51,7 +52,29 @@ class ProductController extends Controller
      * @param bool $withHistory In case we need to get the history relationship
      * @return LengthAwarePaginator
      */
-    private function getProducts(bool $withHistory = false): LengthAwarePaginator
+    private function getProducts(array $withRelations = null): LengthAwarePaginator
+    {
+
+
+        $products = QueryBuilder::for(Product::class)
+                                ->defaultSort('name')
+                                ->allowedSorts(array_keys($this->columns))
+                                ->allowedFilters($this->getAllowedFilters());
+
+        // Load the relationships from $withRelations parameter into the query
+        if (!is_null($withRelations) && is_array($withRelations)) {
+            $products = $products->with(...$withRelations);
+        }
+
+        return $products->paginate()->withQueryString();
+    }
+
+    /**
+     * Allowed filters for the query builder
+     *
+     * @return array
+     */
+    private function getAllowedFilters()
     {
         $globalSearch = AllowedFilter::callback('global', function ($query, $value) {
             $query->where('name', 'LIKE', "%{$value}%")
@@ -60,22 +83,13 @@ class ProductController extends Controller
                 ->orWhere('quantity', 'ILIKE', "%{$value}%");
         });
 
-        $products = QueryBuilder::for(Product::class)
-                                ->defaultSort('name')
-                                ->allowedSorts(array_keys($this->columns))
-                                ->allowedFilters([
-                                    ...array_keys(Arr::except($this->columns, ['uuid', 'price', 'quantity'])),
-                                    AllowedFilter::callback('uuid', fn($query, $value) => $query->where('uuid', 'LIKE', "%{$value}%")),
-                                    AllowedFilter::callback('price', fn($query, $value) => $query->where('price', 'LIKE', "%{$value}%")),
-                                    AllowedFilter::callback('quantity', fn($query, $value) => $query->where('uuid', 'LIKE', "%{$value}%")),
-                                    $globalSearch
-                                ]);
-
-        if ($withHistory) {
-            $products = $products->with('history');
-        }
-
-        return $products->paginate()->withQueryString();
+        return [
+            ...array_keys(Arr::except($this->columns, ['uuid', 'price', 'quantity'])),
+            AllowedFilter::callback('uuid', fn($query, $value) => $query->where('uuid', 'LIKE', "%{$value}%")),
+            AllowedFilter::callback('price', fn($query, $value) => $query->where('price', 'LIKE', "%{$value}%")),
+            AllowedFilter::callback('quantity', fn($query, $value) => $query->where('uuid', 'LIKE', "%{$value}%")),
+            $globalSearch
+        ];
     }
 
     /**
@@ -167,7 +181,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $products = $this->getProducts();
+        $products = $this->getProducts(['owner']);
         $showDialogOpened = true;
 
         return Inertia::render('Products/Index', compact('products', 'product', 'showDialogOpened'))
@@ -182,8 +196,8 @@ class ProductController extends Controller
      */
     public function showHistory(Product $product)
     {
-        $withHistory = true;
-        $products = $this->getProducts($withHistory);
+        $withRelations = ['history'];
+        $products = $this->getProducts($withRelations);
         $historyDialogOpened = true;
 
         return Inertia::render('Products/Index', compact('products', 'product', 'historyDialogOpened'))

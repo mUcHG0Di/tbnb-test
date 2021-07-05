@@ -27,6 +27,7 @@
                         <th v-show="showColumn('description')" @click.prevent="sortBy('description')">Description</th>
                         <th v-show="showColumn('price')" @click.prevent="sortBy('price')">Price</th>
                         <th v-show="showColumn('quantity')" @click.prevent="sortBy('quantity')">Quantity</th>
+                        <th v-show="showColumn('owner.name')" @click.prevent="sortBy('owner.name')">Owner</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </template>
@@ -45,9 +46,12 @@
                             <div class="break-words whitespace-normal w-36">{{ product.uuid }}</div>
                         </td>
                         <td v-show="showColumn('name')">{{ product.name }}</td>
-                        <td v-show="showColumn('description')">{{ product.description }}</td>
+                        <td v-show="showColumn('description')">
+                            <div class="break-words whitespace-normal w-36">{{ product.description }}</div>
+                        </td>
                         <td v-show="showColumn('price')">{{ product.price }}</td>
                         <td v-show="showColumn('quantity')">{{ product.quantity }}</td>
+                        <td v-show="showColumn('owner.name')">{{ (product.owner) ? product.owner.name : '' }}</td>
                         <td>
                             <RowActions
                                 @show="() => { bulkForm.products = [product.uuid]; showDialog = true; }"
@@ -99,6 +103,7 @@
     export default {
         name: 'products-index',
         props: {
+            model: String,
             products: Object,
             product: Object, // If it loads from SHOW or EDIT
             formDialogOpened: Boolean,

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToUser;
 use App\Models\Concerns\HasHistory;
 use App\Models\Concerns\UsesUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +12,7 @@ use \WF\Batch\Traits\Batchable;
 
 class Product extends Model
 {
-    use HasFactory, UsesUuid, HasHistory, Batchable;
+    use HasFactory, UsesUuid, HasHistory, BelongsToUser, Batchable;
 
     /**
      * Mass assign attributes
@@ -19,7 +20,7 @@ class Product extends Model
      * @var string[]
      */
     protected $fillable = [
-        'uuid', 'name', 'description', 'price', 'quantity', 'image'
+        'uuid', 'name', 'description', 'price', 'quantity', 'image',
     ];
 
     /**
@@ -38,6 +39,15 @@ class Product extends Model
      */
     protected $appends = [
         'image_url'
+    ];
+
+    /**
+     * Autoload relations
+     *
+     * @var string[]
+     */
+    protected $with = [
+        'owner'
     ];
 
     public function getImageUrlAttribute()

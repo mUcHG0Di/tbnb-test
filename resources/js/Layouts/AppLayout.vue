@@ -13,7 +13,9 @@
 
                 <v-container>
                     <v-row class="px-3">
-                        <img src="/images/tbnb-logo-white.png" alt="TurnoverBnB" class="h-auto ml-3 w-36">
+                        <inertia-link :href="route('home')">
+                            <img src="/images/tbnb-logo-white.png" alt="TurnoverBnB" class="h-8 ml-3 w-36">
+                        </inertia-link>
 
                         <v-spacer></v-spacer>
 

@@ -96,6 +96,15 @@
                 ></v-text-field>
             </v-col>
 
+            <v-col cols="12" v-if="readonly">
+                <v-text-field
+                    label="Owner: "
+                    :value="(product.owner) ? product.owner.name : ''"
+                    :disabled="busy"
+                    :readonly="readonly"
+                ></v-text-field>
+            </v-col>
+
             <v-col
                 v-if="requiresImage"
                 cols="12"

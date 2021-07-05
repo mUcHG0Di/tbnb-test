@@ -21,7 +21,16 @@ class ProductHistory extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['quantity', 'date'];
+    protected $fillable = ['quantity', 'date', 'user_id'];
+
+    /**
+     * Autoload user involved
+     *
+     * @var string[]
+     */
+    protected $with = [
+        'user'
+    ];
 
     /**
      * Belongs to product relation
@@ -32,4 +41,15 @@ class ProductHistory extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    /**
+     * User who create/update the product quantity
+     *
+     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

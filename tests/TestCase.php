@@ -3,7 +3,7 @@
 namespace Tests;
 
 use App\Models\Product;
-use Closure;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Response;
@@ -39,8 +39,10 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         Storage::fake('public');
-        $this->product = Product::factory()->make();
+        $this->product = Product::factory()->makeOne();
         $this->products = Product::factory()->count(10)->make();
+
+        $this->actingAs(User::factory()->create());
     }
 
     /**

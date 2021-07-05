@@ -18,12 +18,15 @@
                     <template v-slot:default>
                         <thead>
                             <tr>
-                            <th class="text-center">
-                                Quantity
-                            </th>
-                            <th class="text-center">
-                                Date
-                            </th>
+                                <th class="text-center">
+                                    Quantity
+                                </th>
+                                <th class="text-center">
+                                    Date
+                                </th>
+                                <th class="text-center">
+                                    User involved
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -33,6 +36,7 @@
                             >
                                 <td>{{ history.quantity }}</td>
                                 <td>{{ history.date }}</td>
+                                <td>{{ (history.user) ? history.user.name : '' }}</td>
                             </tr>
                         </tbody>
                     </template>
