@@ -15,26 +15,29 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+require __DIR__.'/auth.php';
+
 Route::get('/', function () {
     return redirect()->route('products.index');
 });
 
-Route::post('/products/store/multiple', [ProductController::class, 'bulkStore'])
-    ->name('products.store.multiple');
-Route::patch('/products/update/multiple', [ProductController::class, 'bulkUpdate'])
-    ->name('products.update.multiple');
-Route::delete('/products', [ProductController::class, 'bulkDestroy'])
-    ->name('products.destroy.multiple');
-Route::get('/products/{product}/history', [ProductController::class, 'showHistory'])
-    ->name('products.history');
-Route::resource('/products', ProductController::class);
+Route::group(['middleware' => ['web', 'auth']], function() {
+    Route::post('/products/store/multiple', [ProductController::class, 'bulkStore'])
+        ->name('products.store.multiple');
+    Route::patch('/products/update/multiple', [ProductController::class, 'bulkUpdate'])
+        ->name('products.update.multiple');
+    Route::delete('/products', [ProductController::class, 'bulkDestroy'])
+        ->name('products.destroy.multiple');
+    Route::get('/products/{product}/history', [ProductController::class, 'showHistory'])
+        ->name('products.history');
+    Route::resource('/products', ProductController::class);
 
-// Excel export
-Route::get('export', ExcelController::class)
-    ->name('excel.export')
-    ->prefix('excel');
+    // Ajax requests
+    Route::get('/products/{product}/get-history', [ProductController::class, 'getHistory'])
+        ->name('products.history.get');
 
-// Ajax request
-Route::get('/products/{product}/get-history', [ProductController::class, 'getHistory'])
-    ->name('products.history.get');
-
+    // Excel export
+    Route::get('export', ExcelController::class)
+        ->name('excel.export')
+        ->prefix('excel');
+});

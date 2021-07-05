@@ -19,11 +19,11 @@ use Spatie\QueryBuilder\QueryBuilder;
 class ProductController extends Controller
 {
     /**
-     * Redirects after request
+     * Model table name
      *
-     * @var Illuminate\Http\Response
+     * @var string
      */
-    protected $indexRedirect;
+    protected $tableName;
 
     /**
      * InertiaTable columns

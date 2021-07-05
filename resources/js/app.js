@@ -19,6 +19,7 @@ window.Vue = require('vue').default;
 Vue.use(InertiaApp);
 Vue.use(Vuetify);
 Vue.prototype.$_ = _;
+Vue.mixin({ methods: { route } });
 
 require("./filters");
 

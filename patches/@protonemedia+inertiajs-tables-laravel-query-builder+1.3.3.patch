@@ -1,5 +1,5 @@
 diff --git a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/Table.vue b/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/Table.vue
-index 7281dbf..bf8d1bd 100644
+index 7281dbf..e8f8eeb 100644
 --- a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/Table.vue
 +++ b/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/Table.vue
 @@ -37,7 +37,7 @@ table >>> tr:hover td {
@@ -21,7 +21,7 @@ index 7281dbf..bf8d1bd 100644
                <slot name="head" />
              </thead>
 diff --git a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue b/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue
-index 55321c0..d853465 100644
+index 55321c0..78ee40c 100644
 --- a/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue
 +++ b/node_modules/@protonemedia/inertiajs-tables-laravel-query-builder/js/Tailwind2/TableWrapper.vue
 @@ -1,8 +1,8 @@
@@ -31,8 +31,8 @@ index 55321c0..d853465 100644
 -      <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
 -        <div class="shadow border-b border-gray-200 relative">
 +  <div class="flex flex-col overflow-x-auto overflow-y-hidden">
-+    <div class="-my-2 sm:-mx-6 lg:-mx-8">
-+      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
++    <div class="-my-2">
++      <div class="inline-block min-w-full py-2 align-middle">
 +        <div class="relative border-b border-gray-200">
            <slot />
          </div>
