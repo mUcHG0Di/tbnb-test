@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Product;
+namespace App\Http\Requests\Products;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BulkStoreUpdateRequest extends FormRequest
+class BulkStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

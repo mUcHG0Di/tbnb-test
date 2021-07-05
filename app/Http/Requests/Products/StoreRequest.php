@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Product;
+namespace App\Http\Requests\Products;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DestroyRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,11 @@ class DestroyRequest extends FormRequest
     public function rules()
     {
         return [
-            'products_uuids' => ['required', 'array', 'min:1'],
+            'name' => ['required', 'max:64'],
+            'description' => ['max:128'],
+            'price' => ['required', 'numeric', 'min:1'],
+            'quantity' => ['required', 'numeric', 'min:1'],
+            'image' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
 }

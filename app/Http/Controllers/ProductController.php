@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Product\BulkStoreUpdateRequest;
-use App\Http\Requests\Product\DestroyRequest;
-use App\Http\Requests\Product\StoreUpdateRequest;
-use App\Http\Requests\Product\UpdateRequest;
+use App\Http\Requests\Products\BulkStoreRequest;
+use App\Http\Requests\Products\BulkUpdateRequest;
+use App\Http\Requests\Products\DestroyRequest;
+use App\Http\Requests\Products\StoreRequest;
+use App\Http\Requests\Products\UpdateRequest;
 use App\Models\Product;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use ProtoneMedia\LaravelQueryBuilderInertiaJs\InertiaTable;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
-use WF\Batch\Batch;
 
 class ProductController extends Controller
 {
@@ -98,8 +97,9 @@ class ProductController extends Controller
     public function index()
     {
         $products = $this->getProducts();
+        $model = Product::class;
 
-        return Inertia::render('Products/Index', compact('products'))
+        return Inertia::render('Products/Index', compact('products', 'model'))
                         ->table(fn(InertiaTable $table) => $this->renderTable($table));
     }
 
@@ -123,7 +123,7 @@ class ProductController extends Controller
      * @param StoreRequest $request
      * @return void
      */
-    public function store(StoreUpdateRequest $request)
+    public function store(StoreRequest $request)
     {
         try {
             $filename = $request->file('image')->getClientOriginalName();
@@ -141,10 +141,10 @@ class ProductController extends Controller
     /**
      * Bulk store resources
      *
-     * @param BulkStoreUpdateRequest $request
+     * @param BulkStoreRequest $request
      * @return Illuminate\Http\Response
      */
-    public function bulkStore(BulkStoreUpdateRequest $request)
+    public function bulkStore(BulkStoreRequest $request)
     {
         DB::beginTransaction();
         try {
@@ -208,11 +208,11 @@ class ProductController extends Controller
     /**
      * Update the resource
      *
-     * @param StoreUpdateRequest $request
+     * @param UpdateRequest $request
      * @param Product $product
      * @return Iluminate\Http\Response
      */
-    public function update(StoreUpdateRequest $request, Product $product)
+    public function update(UpdateRequest $request, Product $product)
     {
         try {
             $product->update($request->all());
@@ -225,10 +225,10 @@ class ProductController extends Controller
     /**
      * Bulk update resources
      *
-     * @param BulkStoreUpdateRequest $request
+     * @param BulkUpdateRequest $request
      * @return Illuminate\Http\Response
      */
-    public function bulkUpdate(BulkStoreUpdateRequest $request)
+    public function bulkUpdate(BulkUpdateRequest $request)
     {
         DB::beginTransaction();
         try {

@@ -13,38 +13,12 @@ class ProductControllerTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
 
-    /**
-     * @test
-     */
-    public function validates_fields_on_save()
-    {
-        $product = [
-            'name' => null,
-            'description' => $this->faker->realText(), // Text longer that 128 chars
-            'price' => 'some price',
-            'quantity' => 'some quantity',
-            'image' => null,
-        ];
-        $response = $this->from(route('products.create'))
-                        ->post(route('products.store'), $product);
-
-        $response->assertStatus(302)
-                ->assertRedirect(route('products.create'))
-                ->assertSessionHasErrors([
-                    'name', 'description', 'price', 'quantity', 'image'
-                ]);
-    }
-
-    /**
-     * @test
-     */
+    /** @test */
     public function it_stores_a_single_product()
     {
-        Storage::fake();
-        $product = Product::factory()->make();
-        $product->image = UploadedFile::fake()->image('product.jpg');
+        $this->product->image = UploadedFile::fake()->image('product.jpg');
         $response = $this->from(route('products.create'))
-                        ->post(route('products.store'), $product->toArray());
+                        ->post(route('products.store'), $this->product->toArray());
 
         $response->assertRedirect(route('products.index'))
                 ->assertSessionHasNoErrors();
@@ -52,44 +26,21 @@ class ProductControllerTest extends TestCase
         Storage::assertExists('images/products/product.jpg');
 
         $this->assertDatabaseHas('products', [
-            'name' => $product->name,
-            'description' => $product->description,
-            'price' => $product->price,
-            'quantity' => $product->quantity,
+            'name' => $this->product->name,
+            'description' => $this->product->description,
+            'price' => $this->product->price,
+            'quantity' => $this->product->quantity,
         ]);
 
         $product = Product::first();
         $this->assertCount(1, $product->history);
     }
 
-    /**
-     * @test
-     */
-    public function validates_fields_on_bulk_save()
+    /** @test */
+    public function it_stores_multiple_products()
     {
-        $products = [
-            'products' => [
-                ['description' => $this->faker->realText()]
-            ]
-        ];
-        $response = $this->from(route('products.create'))
-                        ->post(route('products.store.multiple'), $products);
-
-        $response->assertStatus(302)
-                ->assertRedirect(route('products.create'))
-                ->assertSessionHasErrors([
-                    'products.0.name', 'products.0.description', 'products.0.price', 'products.0.quantity'
-                ]);
-    }
-
-    /**
-     * @test
-     */
-    public function it_stores_multiples_products()
-    {
-        $products = Product::factory()->count(10)->make();
-        $products->each(fn($product) => $product->setHidden(['image_url']));
-        $postData = array('products' => $products->toArray());
+        $this->products->each(fn($product) => $product->setHidden(['image_url', 'image']));
+        $postData = array('products' => $this->products->toArray());
 
         $response = $this->from(route('products.create'))
                         ->post(route('products.store.multiple'), $postData);
@@ -97,21 +48,19 @@ class ProductControllerTest extends TestCase
         $response->assertRedirect(route('products.index'))
                 ->assertSessionHasNoErrors();
 
-        $this->assertDatabaseCount('products', $products->count())
-            ->assertDatabaseCount('product_histories', $products->count());
+        $this->assertDatabaseCount('products', $this->products->count())
+            ->assertDatabaseCount('product_histories', $this->products->count());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_updates_a_single_product()
     {
         $product = Product::factory()->create();
         $newName = 'Named edited';
-        $product->name = $newName;
+        $this->product->name = $newName;
 
         $response = $this->from(route('products.edit', $product))
-                        ->put(route('products.update', $product), $product->toArray());
+                        ->put(route('products.update', $product), $this->product->toArray());
 
         $response->assertRedirect(route('products.index'))
                 ->assertSessionHasNoErrors();
@@ -121,30 +70,29 @@ class ProductControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_updates_multiple_products()
     {
-        $products = Product::factory()->count(10)->create();
-        $products->each(fn($product) => $product->setHidden(['image_url'])->name .= ' edited'); // Edit every model
-        $postData = array('products' => $products->toArray());
+        $this->products->each(function($product) {
+            // Save and edit every model
+            $product->save();
+            $product->setHidden(['image_url', 'image']);
+            $product->name .= ' edited';
+        });
+        $postData = array('products' => $this->products->toArray());
 
         $response = $this->patch(route('products.update.multiple'), $postData);
-
         $response->assertRedirect(route('products.index'))
                 ->assertSessionHasNoErrors();
 
         $this->assertDatabaseCount('products', 10);
-        $products->each(function($product) {
+        $this->products->each(function($product) {
             $product = $product->refresh();
             $this->assertDatabaseHas('products', $product->toArray());
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_deletes_a_single_product()
     {
         $product = Product::factory()->create();
@@ -153,12 +101,10 @@ class ProductControllerTest extends TestCase
         $response->assertRedirect(route('products.index'))
                 ->assertSessionHasNoErrors();
 
-        $this->assertDeleted('products', $product->setHidden(['image_url'])->toArray());
+        $this->assertDeleted('products', $this->product->setHidden(['image_url'])->toArray());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_deletes_multiple_products()
     {
         $products = Product::factory()->count(10)->create();

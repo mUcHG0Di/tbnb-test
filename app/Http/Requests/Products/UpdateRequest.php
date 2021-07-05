@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Product;
+namespace App\Http\Requests\Products;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreUpdateRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,19 +23,12 @@ class StoreUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [
+        return [
             'name' => ['required', 'max:64'],
             'description' => ['max:128'],
             'price' => ['required', 'numeric', 'min:1'],
             'quantity' => ['required', 'numeric', 'min:1'],
             'image' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
-
-        // If it's an update, image is not required
-        $isUpdate = in_array($this->method(), ['PUT', 'PATCH']);
-        $newImageRule = ($isUpdate) ? 'nullable' : 'required';
-        array_push($rules['image'], $newImageRule);
-
-        return $rules;
     }
 }

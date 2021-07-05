@@ -27,6 +27,7 @@ class ProductFactory extends Factory
             'description' => $this->faker->domainWord(),
             'price' => $this->faker->randomFloat(2, 1, 100) * 10,
             'quantity' => $this->faker->randomDigitNot(0),
+            'image' => UploadedFile::fake()->image('product.jpg'),
         ];
     }
 }

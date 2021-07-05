@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,7 +27,12 @@ Route::delete('/products', [ProductController::class, 'bulkDestroy'])
     ->name('products.destroy.multiple');
 Route::get('/products/{product}/history', [ProductController::class, 'showHistory'])
     ->name('products.history');
-Route::resource('/products', ProductController::class); //->parameter('product:id', 'product:uuid');
+Route::resource('/products', ProductController::class);
+
+// Excel export
+Route::get('export', ExcelController::class)
+    ->name('excel.export')
+    ->prefix('excel');
 
 // Ajax request
 Route::get('/products/{product}/get-history', [ProductController::class, 'getHistory'])
