@@ -47,7 +47,7 @@
                         <br>
 
                         <v-btn
-                            v-if="!single"
+                            v-if="!single && !editMode"
                             x-small
                             color="primary"
                             @click="form.products.push({name: null, description: null, price: 0, quantity: 0})"

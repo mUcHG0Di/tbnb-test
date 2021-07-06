@@ -21,20 +21,20 @@
             >
                 <template #head>
                     <tr>
-                        <th>&nbsp;</th>
+                        <th class="pr-2">&nbsp;</th>
                         <th v-show="showColumn('uuid')" @click.prevent="sortBy('uuid')">UUID</th>
                         <th v-show="showColumn('name')" @click.prevent="sortBy('name')">Name</th>
                         <th v-show="showColumn('description')" @click.prevent="sortBy('description')">Description</th>
-                        <th v-show="showColumn('price')" @click.prevent="sortBy('price')">Price</th>
-                        <th v-show="showColumn('quantity')" @click.prevent="sortBy('quantity')">Quantity</th>
+                        <th v-show="showColumn('price')" @click.prevent="sortBy('price')" class="px-4">Price</th>
+                        <th v-show="showColumn('quantity')" @click.prevent="sortBy('quantity')" class="px-4">Quantity</th>
                         <th v-show="showColumn('owner.name')" @click.prevent="sortBy('owner.name')">Owner</th>
-                        <th class="text-center">Actions</th>
+                        <th class="px-1 text-center">Actions</th>
                     </tr>
                 </template>
 
                 <template #body>
                     <tr v-for="product in products.data" :key="product.uuid">
-                        <td class="px-2 py-1">
+                        <td class="py-1 pr-2">
                             <v-checkbox
                                 :id="`product_${product.uuid}`"
                                 v-model="bulkForm.products"
@@ -49,10 +49,10 @@
                         <td v-show="showColumn('description')">
                             <div class="break-words whitespace-normal w-36">{{ product.description }}</div>
                         </td>
-                        <td v-show="showColumn('price')">{{ product.price }}</td>
-                        <td v-show="showColumn('quantity')">{{ product.quantity }}</td>
+                        <td v-show="showColumn('price')" class="px-4">{{ product.price }}</td>
+                        <td v-show="showColumn('quantity')" class="px-4">{{ product.quantity }}</td>
                         <td v-show="showColumn('owner.name')">{{ (product.owner) ? product.owner.name : '' }}</td>
-                        <td>
+                        <td class="px-1">
                             <RowActions
                                 @show="() => { bulkForm.products = [product.uuid]; showDialog = true; }"
                                 @history="() => { bulkForm.products = [product.uuid]; historyDialog = true; }"
@@ -70,21 +70,21 @@
             v-if="formDialog"
             :showing="formDialog"
             :single="singleMode"
-            :selectedProducts="editMode ? $_.filter(products.data, (product) => bulkForm.products.includes(product.uuid)) : [getEmptyProduct()]"
+            :selectedProducts="selectedProducts"
             @close="formDialog = false;"
         />
 
         <ShowModal
             v-if="showDialog"
             :showing="showDialog"
-            :product="products.data.find((product) => product.uuid == $_.first(bulkForm.products))"
+            :product="selectedSingleProduct"
             @close="showDialog = false"
         />
 
         <HistoryModal
             v-if="historyDialog"
             :showing="historyDialog"
-            :product="products.data.find((product) => product.uuid ==  $_.first(bulkForm.products))"
+            :product="selectedSingleProduct"
             @close="historyDialog = false"
         />
     </app-layout>
@@ -140,13 +140,26 @@
             };
         },
 
+        computed: {
+            selectedSingleProduct: function() {
+                const selectedProduct = this.$_.first(this.products.data, (product) => product.uuid == this.$_.first(this.bulkForm.products))
+                return selectedProduct;
+            },
+            selectedProducts: function() {
+                const selectedProducts = this.editMode ? this.$_.filter(this.products.data, (product) => this.bulkForm.products.includes(product.uuid)) : [this.getEmptyProduct()]
+                return selectedProducts;
+            },
+        },
+
         mounted: function() {
             this.formDialog = this.formDialogOpened;
             this.bulkForm.products = [];
             if (this.showDialogOpened || this.historyDialogOpened) {
+                const matchingProduct = this.$_.first(this.products.data, (prod) => (prod.uuid == this.product.uuid));
+                this.bulkForm.products.push(matchingProduct);
+                console.log(this.bulkForm.products);
                 this.showDialog = this.showDialogOpened;
                 this.historyDialog = this.historyDialogOpened;
-                this.bulkForm.products.push(this.products.data.filter((prod) => (prod.uuid == this.product.uuid))[0]);
             }
 
             this.configDatatable();

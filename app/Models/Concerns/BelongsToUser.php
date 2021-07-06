@@ -3,6 +3,7 @@
 namespace App\Models\Concerns;
 
 use App\Models\User;
+use App\Notifications\ProductQuantityUpdated;
 
 trait BelongsToUser {
 
@@ -16,7 +17,7 @@ trait BelongsToUser {
         static::updated(function($model) {
             // Notify owner if is not the one editing and the quantity was updated
             if (auth()->user()->id != $model->owner_id && $model->wasChanged('quantity')) {
-                $model->owner->notify(ProductQuantityUpdated::class);
+                $model->owner->notify(new ProductQuantityUpdated($model));
             }
         });
     }

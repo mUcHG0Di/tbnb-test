@@ -13,8 +13,8 @@
 
                 <v-container>
                     <v-row class="px-3">
-                        <inertia-link :href="route('home')">
-                            <img src="/images/tbnb-logo-white.png" alt="TurnoverBnB" class="h-8 ml-3 w-36">
+                        <inertia-link :href="route('home')" class="self-center">
+                            <img src="/images/tbnb-logo-white.png" alt="TurnoverBnB" class="w-auto ml-3 h-7">
                         </inertia-link>
 
                         <v-spacer></v-spacer>
@@ -69,7 +69,7 @@
 
 <script>
     import ToastMessage from '@/Components/Common/ToastMessage';
-    import BreezeDropdownLink from '@/Components/DropdownLink';
+    import BreezeDropdownLink from '@/Components/Breeze/DropdownLink';
 
     export default {
         name: 'AppLayout',
