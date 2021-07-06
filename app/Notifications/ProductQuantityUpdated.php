@@ -50,7 +50,7 @@ class ProductQuantityUpdated extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)->markdown('emails.products.updated', $this->toArray($notifiable))
-                                ->subject(__('Product quantity modified'));
+                                ->subject(__('email.subject'));
     }
 
     /**
@@ -63,7 +63,7 @@ class ProductQuantityUpdated extends Notification
     {
         return [
             'owner' => $notifiable,
-            'user_involved' => $this->product->history->first()->user,
+            'user_involved' => auth()->user(),
             'product' => $this->product
         ];
     }

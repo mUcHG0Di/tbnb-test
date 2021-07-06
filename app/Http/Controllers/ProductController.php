@@ -234,6 +234,8 @@ class ProductController extends Controller
                 $filename = $request->file('image')->getClientOriginalName();
                 $path = $request->file('image')->storeAs('images/products', $filename);
                 $productData['image'] = $path;
+            } else {
+                Arr::forget($productData, 'image');
             }
 
             $product->update($productData);
@@ -268,6 +270,7 @@ class ProductController extends Controller
             return redirect()->route('products.index')->with('success', __('crud.bulkupdate.success'));
         } catch (\Exception $e) {
             DB::rollBack();
+            // dd($e->getMessage());
             return redirect()->route('products.index', [], 302)->with('error', __('crud.bulkupdate.error') . $this->getError($e));
         }
     }

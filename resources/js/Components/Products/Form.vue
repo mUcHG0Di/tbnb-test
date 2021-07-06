@@ -95,6 +95,7 @@
                     :label="label('image')"
                     :error="hasError(index, 'image')"
                     :error-messages="errorMessage(index, 'image')"
+                    @change="sync"
                 ></v-file-input>
 
                 <div
@@ -138,7 +139,6 @@ export default {
     data: function() {
         return {
             showBorder: false,
-            imageSelected: null,
             form: {
 				name: null,
 				description: null,
@@ -160,27 +160,26 @@ export default {
         mdiMinusIcon: function() {
             return (!this.readonly) ? 'mdi-minus' : null;
         },
+        imageSelected: function() {
+            if (this.form.image == null) {
+                return null;
+            } else {
+                return URL.createObjectURL(this.form.image) || null;
+            }
+        },
     },
 
     watch: {
         "product": function() {
             this.formFill();
         },
-        "form.image": function(newVal, oldVal) {
-            if (newVal == null) {
-                this.imageSelected = null;
-            } else {
-                this.imageSelected = URL.createObjectURL(newVal) || null;
-            }
-
-            this.sync();
-        },
     },
 
     methods: {
         formFill: function() {
             // Assign values, except for image
-            Object.assign(this.form, this.$_.pick(this.product, ['name', 'description', 'price', 'quantity']));
+            Object.assign(this.form, this.$_.pick(this.product, ['uuid', 'name', 'description', 'price', 'quantity']));
+            this.sync();
         },
 
         label: function(field) {
@@ -198,7 +197,7 @@ export default {
         // Number methods
         numberKeyUp: function(event) {
             event.target.value = this.$options.filters.onlyNumbers(event.target.value);
-            sync();
+            this.sync();
         },
         sub: function(property) {
             if (this.readonly) return;

@@ -7,15 +7,15 @@
 @endslot
 
 <div style="text-align: center; margin-top: 50px; margin-bottom: 30px; font-size: 18px;">
-<h1 aligin="center" style="text-align:center;">Your product was modified</h1>
+<h1 aligin="center" style="text-align:center;">{{ __('email.title') }}</h1>
 
 <p align="center" style="text-align: center;">
-    Your product was modified by {{ $user_involved->name }}
+    {{ __('email.message', ['user_involved' => $user_involved->name]) }}
 </p>
 </div>
 
 @component('mail::button', ['url' => route('products.show', $product->uuid)])
-Show product
+{{ __('email.button') }}
 @endcomponent
 
 @slot('footer')

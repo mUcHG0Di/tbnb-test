@@ -52,6 +52,7 @@ class Product extends Model
 
     public function getImageUrlAttribute()
     {
+        if (is_null($this->getAttribute('image'))) return null;
         return Storage::url($this->getAttribute('image'));
     }
 
@@ -63,6 +64,17 @@ class Product extends Model
     public function history()
     {
         return $this->hasMany(ProductHistory::class)
+                    ->orderBy('date', 'DESC');
+    }
+
+    /**
+     * Get the last history of the product
+     *
+     * @return Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestHistory()
+    {
+        return $this->hasOne(ProductHistory::class)
                     ->orderBy('date', 'DESC');
     }
 }

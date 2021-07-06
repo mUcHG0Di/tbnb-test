@@ -20,7 +20,7 @@
                                     :busy="singleForm.busy"
                                     :errors="singleForm.errors || {}"
                                     requiresImage
-                                    @syncForm="(newData) => { Object.assign(singleForm, newData); }"
+                                    @syncForm="syncForm"
                                 />
                             </div>
                         </template>
@@ -103,6 +103,7 @@ export default {
             }),
             processing: false,
             singleForm: this.$inertia.form({
+                _method: 'POST',
                 name: null,
                 description: null,
                 image: null,
@@ -133,11 +134,15 @@ export default {
             this.singleForm.clearErrors();
             this.singleForm.reset();
 
-            // Redirect to index
+            // Redirect to index if needed
             if (route().current('products.create')) {
                 this.$inertia.visit(route('products.index'));
             }
             this.$emit('close');
+        },
+
+        syncForm: function(newData) {
+            Object.assign(this.singleForm, this.$_.pick(newData, ['uuid', 'name', 'description', 'price', 'quantity', 'image']));
         },
 
         save: function() {
@@ -165,8 +170,9 @@ export default {
 
         update: function(options) {
             if (this.single) {
+                this.singleForm._method = 'PUT';
                 const selectedProductUUID = this.$_.first(this.selectedProducts).uuid;
-                this.singleForm.patch(route('products.update', selectedProductUUID), options);
+                this.singleForm.post(route('products.update', selectedProductUUID), options);
             } else {
                 this.form.patch(route('products.update.multiple'), options);
             }

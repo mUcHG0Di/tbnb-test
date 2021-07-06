@@ -10,7 +10,7 @@
             </v-card-title>
             <v-card-text>
                     <v-container>
-                        <img :src="product.image_url" class="w-3/5 h-auto mx-auto mb-7" />
+                        <img v-if="product.image != null" :src="product.image_url" class="w-3/5 h-auto mx-auto mb-7" />
 
                         <ProductForm
                                 :product="$_.pick(form, ['name', 'description', 'price', 'quantity', 'owner'])"
@@ -65,6 +65,7 @@ export default {
                 price: 0,
                 quantity: 0,
                 owner: null,
+                image: null,
             }),
         };
     },
@@ -84,8 +85,10 @@ export default {
             this.form.clearErrors();
             this.form.reset();
 
-            // Redirect to index
-            this.$inertia.visit(route('products.index'));
+            // Redirect to index if needed
+            if (route().current('products.show')) {
+                this.$inertia.visit(route('products.index'));
+            }
             this.$emit('close');
         },
 
@@ -100,7 +103,7 @@ export default {
         destroy: function() {
             const title = this.$t('showModal.deleteConfirmation.title');
             const message = this.$t('showModal.deleteConfirmation.message', {product_name: this.form.name});
-            // `Are you sure you want to delete the product '${this.form.name}'`;
+
             this.$root.confirmDestroy(title, message, () => {
                 this.form.delete(route('products.destroy', this.form.uuid), {
                     onSuccess: () => { this.close(); },

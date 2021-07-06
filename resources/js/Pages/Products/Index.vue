@@ -13,6 +13,7 @@
 
             <!-- Table -->
             <Table
+                ref="table"
                 :filters="queryBuilderProps.filters"
                 :search="queryBuilderProps.search"
                 :columns="queryBuilderProps.columns"
@@ -153,7 +154,7 @@
 
         computed: {
             selectedSingleProduct: function() {
-                const selectedProduct = this.$_.first(this.products.data, (product) => product.uuid == this.$_.first(this.bulkForm.products))
+                const selectedProduct = this.$_.filter(this.products.data, (product) => product.uuid == this.bulkForm.products[0])[0];
                 return selectedProduct;
             },
             selectedProducts: function() {
@@ -165,10 +166,11 @@
         mounted: function() {
             this.formDialog = this.formDialogOpened;
             this.bulkForm.products = [];
+
+            // Load "selected" product
             if (this.showDialogOpened || this.historyDialogOpened) {
                 const matchingProduct = this.$_.first(this.products.data, (prod) => (prod.uuid == this.product.uuid));
                 this.bulkForm.products.push(matchingProduct);
-                console.log(this.bulkForm.products);
                 this.showDialog = this.showDialogOpened;
                 this.historyDialog = this.historyDialogOpened;
             }
@@ -182,6 +184,10 @@
                 const nav = document.querySelector('.bg-white.px-4.py-3');
                 nav.parentNode.parentNode.parentNode.parentNode.parentNode.append(nav);
                 nav.classList.add('mt-3');
+
+                if (this.$props.products.data.length > 0) {
+                    this.$refs.table.changeColumnStatus('description', false);
+                }
             },
 
             getEmptyProduct: function() {
@@ -190,6 +196,7 @@
                     description: null,
                     price: 0,
                     quantity: 0,
+                    image: null,
                 }
             },
 

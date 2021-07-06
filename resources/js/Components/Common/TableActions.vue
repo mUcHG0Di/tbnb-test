@@ -1,11 +1,11 @@
 <template>
-    <v-row>
-        <v-card-title class=" text-h5">{{ title }}</v-card-title>
+    <v-row class="mobile-bottom-margin">
+        <v-card-title class="text-h5">{{ title }}</v-card-title>
 
         <v-spacer></v-spacer>
 
 
-        <div class="flex flex-row flex-wrap justify-end w-full mb-5 sm:w-auto sm:mb-0">
+        <div class="flex flex-row flex-wrap items-center justify-end w-full sm:w-auto">
             <!-- <div class="w-1/2 px-2 my-2 sm:w-auto">
                 <v-btn
                     elevation="1"
@@ -81,5 +81,13 @@ export default {
 </script>
 
 <style scoped>
+.mobile-bottom-margin {
+    margin-bottom: 0;
+}
 
+@media only screen and (max-width: 480px) {
+    .mobile-bottom-margin {
+        margin-bottom: 20px !important;
+    }
+}
 </style>
