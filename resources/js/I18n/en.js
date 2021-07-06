@@ -1,4 +1,26 @@
 const en = {
+    auth: {
+        login: {
+            email: 'Email',
+            password: 'Password',
+            rememberMe: "Remember me",
+            forgotPassword: "Forgot your password?",
+            notRegistered: "Not registered?"
+        },
+        forgotPassword: {
+            message:
+                "Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one. ",
+            confirm: "Email password reset link",
+        },
+        register: {
+            name: 'Name',
+            email: 'Email',
+            password: 'Password',
+            confirmPassword: 'Confirm password',
+            alreadyRegistered: 'Already registered?',
+            register: 'Register',
+        },
+    },
     appBar: {
         logout: "Log out"
     },
@@ -79,7 +101,7 @@ const en = {
             message:
                 'Are you sure you want to delete the product "{product_name}"?',
             proceed: "Yes, remove",
-            cancel: "Cancel",
+            cancel: "Cancel"
         }
     }
 };

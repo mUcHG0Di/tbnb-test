@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="mb-4 text-sm text-gray-600">
-            Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.
+            {{ $t('auth.forgotPassword.message') }}
         </div>
 
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
@@ -18,7 +18,7 @@
 
             <div class="flex items-center justify-end mt-4">
                 <breeze-button :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Email Password Reset Link
+                    {{ $t('auth.forgotPassword.confirm') }}
                 </breeze-button>
             </div>
         </form>

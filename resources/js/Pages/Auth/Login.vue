@@ -20,17 +20,17 @@
             <div class="flex flex-row justify-between mt-4">
                 <label class="flex items-center">
                     <breeze-checkbox name="remember" v-model="form.remember"/>
-                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                    <span class="ml-2 text-sm text-gray-600">{{ $t('auth.login.rememberMe') }}</span>
                 </label>
 
                 <inertia-link v-if="canResetPassword" :href="route('password.request')" class="ml-4 text-sm text-gray-600 underline hover:text-gray-900">
-                    Forgot your password?
+                    {{ $t('auth.login.forgotPassword') }}
                 </inertia-link>
             </div>
 
             <div class="flex items-center justify-end mt-4">
                 <inertia-link :href="route('register')" class="text-sm text-gray-600 underline hover:text-gray-900">
-                    Not registered?
+                    {{ $t('auth.login.notRegistered') }}
                 </inertia-link>
 
                 <breeze-button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">

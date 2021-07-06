@@ -41,7 +41,7 @@ window.Toast = Toast;
 
 // Create VueI18n instance with options
 const i18n = new VueI18n({
-    locale: 'es', // set locale
+    locale: 'en', // set locale
     messages: translations, // set locale translations
 })
 

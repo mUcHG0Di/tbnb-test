@@ -4,17 +4,17 @@
 
         <form @submit.prevent="submit">
             <div>
-                <breeze-label for="email" value="Email" />
+                <breeze-label for="email" :value="$t('auth.register.email')" />
                 <breeze-input id="email" type="email" class="block w-full mt-1" v-model="form.email" required autofocus autocomplete="username" />
             </div>
 
             <div class="mt-4">
-                <breeze-label for="password" value="Password" />
+                <breeze-label for="password" :value="$t('auth.register.password')" />
                 <breeze-input id="password" type="password" class="block w-full mt-1" v-model="form.password" required autocomplete="new-password" />
             </div>
 
             <div class="mt-4">
-                <breeze-label for="password_confirmation" value="Confirm Password" />
+                <breeze-label for="password_confirmation" :value="$t('auth.register.confirmPassword')" />
                 <breeze-input id="password_confirmation" type="password" class="block w-full mt-1" v-model="form.password_confirmation" required autocomplete="new-password" />
             </div>
 

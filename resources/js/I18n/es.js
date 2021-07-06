@@ -1,4 +1,26 @@
 const es = {
+    auth: {
+        login: {
+            email: "Email",
+            password: "Password",
+            rememberMe: "Recordarme",
+            forgotPassword: "¿Olvidaste tu password?",
+            notRegistered: "¿No estás registrado?"
+        },
+        forgotPassword: {
+            message:
+                "¿Olvidaste tu password? No hay problema. Sólo dinos tu dirección de email y te enviaremos un link de reseteo de password que te permitirá elegir uno nuevo. ",
+            confirm: "Enviar link de reseteo"
+        },
+        register: {
+            name: "Nombre",
+            email: "Email",
+            password: "Password",
+            confirmPassword: "Confirmar password",
+            alreadyRegistered: "¿Ya estás registrado?",
+            register: "Registrar"
+        }
+    },
     appBar: {
         logout: "Cerrar sesión"
     },
