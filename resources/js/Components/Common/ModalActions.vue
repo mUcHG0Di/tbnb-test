@@ -8,7 +8,7 @@
             class="text--white"
             @click="$emit('editMode', true);"
         >
-            Edit
+            {{ $t('modalActions.edit') }}
         </v-btn>
 
         <v-btn
@@ -19,7 +19,7 @@
             class="text--white"
             @click="$emit('destroy')"
         >
-            Delete
+            {{ $t('modalActions.delete') }}
         </v-btn>
 
         <v-spacer></v-spacer>
@@ -31,7 +31,7 @@
             text
             @click="$emit('close')"
         >
-            Close
+            {{ $t('modalActions.close') }}
         </v-btn>
         <v-btn
             v-show="editMode"
@@ -40,7 +40,7 @@
             text
             @click="$emit('cancel')"
         >
-            Cancel
+            {{ $t('modalActions.cancel') }}
         </v-btn>
         <v-btn
             v-show="editMode"
@@ -50,7 +50,7 @@
             text
             @click="$emit('save')"
         >
-            Save
+            {{ $t('modalActions.save') }}
         </v-btn>
     </v-card-actions>
 </template>

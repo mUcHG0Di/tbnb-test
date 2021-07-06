@@ -8,7 +8,7 @@
             @click="$emit('show')"
         >
             <v-icon small class="mr-1">mdi-eye</v-icon>
-            Show
+            {{ $t('rowActions.show') }}
         </v-btn>
         <v-btn
             x-small
@@ -18,7 +18,7 @@
             @click="$emit('history')"
         >
             <v-icon small class="mr-1">mdi-clipboard-list</v-icon>
-            History
+            {{ $t('rowActions.history') }}
         </v-btn>
         <v-btn
             x-small
@@ -28,7 +28,7 @@
             @click="$emit('edit')"
         >
             <v-icon small class="mr-1">mdi-pencil</v-icon>
-            Update
+            {{ $t('rowActions.update') }}
         </v-btn>
         <v-btn
             x-small
@@ -38,7 +38,7 @@
             @click="$emit('destroy')"
         >
             <v-icon small class="mr-1">mdi-delete</v-icon>
-            Delete
+            {{ $t('rowActions.delete') }}
         </v-btn>
     </div>
 </template>

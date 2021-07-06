@@ -6,6 +6,17 @@
 
 
         <div class="flex flex-row flex-wrap justify-end w-full mb-5 sm:w-auto sm:mb-0">
+            <!-- <div class="w-1/2 px-2 my-2 sm:w-auto">
+                <v-btn
+                    elevation="1"
+                    color="purple darken"
+                    class="w-full white--text"
+                    @click="$emit('excel')"
+                >
+                    <v-icon small class="mr-1">mdi-file-excel-outline</v-icon>
+                    Excel
+                </v-btn>
+            </div> -->
             <div class="w-1/2 px-2 my-2 sm:w-auto">
                 <v-btn
                     elevation="1"
@@ -14,7 +25,7 @@
                     @click="$emit('add')"
                 >
                     <v-icon small class="mr-1">mdi-plus-box-outline</v-icon>
-                    Add
+                    {{ $t('tableActions.add') }}
                 </v-btn>
             </div>
             <div class="w-1/2 px-2 my-2 sm:w-auto">
@@ -25,7 +36,7 @@
                     @click="$emit('addMultiple')"
                 >
                     <v-icon small class="mr-1">mdi-plus-box-multiple-outline</v-icon>
-                    Bulk add
+                    {{ $t('tableActions.bulkAdd') }}
                 </v-btn>
             </div>
             <div class="w-1/2 px-2 my-2 sm:w-auto">
@@ -37,7 +48,7 @@
                     @click="$emit('edit')"
                 >
                     <v-icon small class="mr-1">mdi-square-edit-outline</v-icon>
-                    Bulk update
+                    {{ $t('tableActions.bulkUpdate') }}
                 </v-btn>
             </div>
             <div class="w-1/2 px-2 my-2 sm:w-auto">
@@ -49,7 +60,7 @@
                     @click="$emit('destroy')"
                 >
                     <v-icon small class="mr-1">mdi-delete-sweep-outline</v-icon>
-                    Bulk delete
+                    {{ $t('tableActions.bulkDelete') }}
                 </v-btn>
             </div>
         </div>

@@ -22,7 +22,7 @@
                     </v-icon>
                 </v-btn>
             </template>
-            Remove this form
+            {{ $t('removeFormButton.tooltip') }}
         </v-tooltip>
     </v-row>
 </template>

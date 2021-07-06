@@ -3,7 +3,7 @@
         <v-container>
             <!-- Actions -->
             <TableActions
-                title="Products"
+                :title="$t('indexPage.title')"
                 :selectedCount="bulkForm.products.length"
                 @add="editMode = false; singleMode = formDialog = true;"
                 @addMultiple="editMode = singleMode = false; formDialog = true;"
@@ -23,11 +23,11 @@
                     <tr>
                         <th class="pr-2">&nbsp;</th>
                         <th v-show="showColumn('uuid')" @click.prevent="sortBy('uuid')">UUID</th>
-                        <th v-show="showColumn('name')" @click.prevent="sortBy('name')">Name</th>
-                        <th v-show="showColumn('description')" @click.prevent="sortBy('description')">Description</th>
-                        <th v-show="showColumn('price')" @click.prevent="sortBy('price')" class="px-4">Price</th>
-                        <th v-show="showColumn('quantity')" @click.prevent="sortBy('quantity')" class="px-4">Quantity</th>
-                        <th v-show="showColumn('owner.name')" @click.prevent="sortBy('owner.name')">Owner</th>
+                        <th v-show="showColumn('name')" @click.prevent="sortBy('name')">{{ $t('indexPage.tableColumns.name') }}</th>
+                        <th v-show="showColumn('description')" @click.prevent="sortBy('description')">{{ $t('indexPage.tableColumns.description') }}</th>
+                        <th v-show="showColumn('price')" @click.prevent="sortBy('price')" class="px-4">{{ $t('indexPage.tableColumns.price') }}</th>
+                        <th v-show="showColumn('quantity')" @click.prevent="sortBy('quantity')" class="px-4">{{ $t('indexPage.tableColumns.quantity') }}</th>
+                        <th v-show="showColumn('owner.name')" @click.prevent="sortBy('owner.name')">{{ $t('indexPage.tableColumns.owner') }}</th>
                         <th class="px-1 text-center">Actions</th>
                     </tr>
                 </template>
@@ -98,7 +98,7 @@
     import ShowModal from '@/Components/Products/ShowModal';
     import FormModal from '@/Components/Products/FormModal';
     import HistoryModal from '@/Components/Products/HistoryModal';
-    import { InteractsWithQueryBuilder, Tailwind2 } from '@protonemedia/inertiajs-tables-laravel-query-builder';
+    import { InteractsWithQueryBuilder, Tailwind2, Components } from '@protonemedia/inertiajs-tables-laravel-query-builder';
 
     export default {
         name: 'products-index',
@@ -138,6 +138,17 @@
                     resetOnSuccess: true,
                 })
             };
+        },
+
+        created: function() {
+            Components.Pagination.setTranslations({
+                no_results_found: this.$t('indexPage.tablePagination.no_results_found'),
+                previous: this.$t('indexPage.tablePagination.previous'),
+                next: this.$t('indexPage.tablePagination.next'),
+                to: this.$t('indexPage.tablePagination.to'),
+                of: this.$t('indexPage.tablePagination.of'),
+                results: this.$t('indexPage.tablePagination.results'),
+            });
         },
 
         computed: {
@@ -183,8 +194,8 @@
             },
 
             destroySingle: function(product) {
-                const title = 'Remove product';
-                const message = `Are you sure you want to remove the product "${product.name}?"`;
+                const title = this.$tc('indexPage.deleteConfirmation.title', 1);
+                const message = this.$tc('indexPage.deleteConfirmation.message', 1, { product_name: product.name });
                 this.$root.confirmDestroy(title, message, () => {
                     this.bulkForm.transform((data) => ({
                         products_uuids: data.products,
@@ -200,7 +211,7 @@
             },
 
             destroyMultiple: function() {
-                const title = 'Remove products';
+                const title = this.$tc('indexPage.deleteConfirmation.title', 2);
                 const message = this.getFormattedMessage();
                 this.$root.confirmDestroy(title, message, () => {
                     this.bulkForm.transform((data) => ({
@@ -217,7 +228,7 @@
             },
 
             getFormattedMessage: function() {
-                let message = "Are you sure you want to remove the following products?";
+                let message = this.$tc('indexPage.deleteConfirmation.message', 2);
                 message += "<ul style=\"margin-top: 20px; list-style: disc; text-align: left; margin-left: 30px;\">";
                 this.$_.filter(this.products.data, (product) => (this.bulkForm.products.includes(product.uuid)))
                     .forEach((product) => {

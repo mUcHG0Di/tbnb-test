@@ -6,7 +6,7 @@
     >
         <v-card>
             <v-card-title>
-                <span class="mx-auto text-h5">{{ title }}{{ (!this.single) ? 's' : '' }}</span>
+                <span class="mx-auto text-h5">{{ title }}</span>
             </v-card-title>
             <v-card-text>
                     <v-container>
@@ -42,7 +42,7 @@
                             </div>
                         </template>
 
-                        <small>* Indicates required field</small>
+                        <small>{{ $t('formModal.requiredObs') }}</small>
                         <br>
                         <br>
 
@@ -53,7 +53,7 @@
                             @click="form.products.push({name: null, description: null, price: 0, quantity: 0})"
                         >
                             <v-icon x-small class="mr-1">mdi-plus</v-icon>
-                            Add another product
+                            {{ $t('formModal.addAnotherProduct') }}
                         </v-btn>
                     </v-container>
             </v-card-text>
@@ -119,7 +119,10 @@ export default {
 
     computed: {
         title: function() {
-            return (!this.editMode) ? 'Create product' : 'Edit product';
+            return (!this.editMode) ?
+                        this.$tc('formModal.createProduct', this.single ? 1 : 2)
+                    :
+                        this.$tc('formModal.editProduct', this.single ? 1 : 2);
         },
     },
 
@@ -162,7 +165,8 @@ export default {
 
         update: function(options) {
             if (this.single) {
-                this.singleForm.patch(route('products.update', this.$_.first(this.selectedProducts).uuid), options);
+                const selectedProductUUID = this.$_.first(this.selectedProducts).uuid;
+                this.singleForm.patch(route('products.update', selectedProductUUID), options);
             } else {
                 this.form.patch(route('products.update.multiple'), options);
             }

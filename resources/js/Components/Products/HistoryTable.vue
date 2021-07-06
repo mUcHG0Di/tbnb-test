@@ -7,13 +7,13 @@
                 <thead>
                     <tr>
                         <th class="text-center">
-                            Quantity
+                            {{ $t('historyTable.quantity') }}
                         </th>
                         <th class="text-center">
-                            Date
+                            {{ $t('historyTable.date') }}
                         </th>
                         <th class="text-center">
-                            User involved
+                            {{ $t('historyTable.modifiedBy') }}
                         </th>
                     </tr>
                 </thead>

@@ -21,7 +21,7 @@
                             />
 
                         <div v-if="editMode">
-                            <small>* Indicates required field</small>
+                            <small>{{ $t('showModal.requiredObs') }}</small>
                         </div>
                     </v-container>
             </v-card-text>
@@ -75,7 +75,7 @@ export default {
 
     computed: {
         title: function() {
-            return (!this.editMode) ? 'Show product' : 'Edit product';
+            return (!this.editMode) ? this.$t('showModal.showProduct') : this.$t('showModal.editProduct');
         },
     },
 
@@ -98,8 +98,10 @@ export default {
         },
 
         destroy: function() {
-            const message = `Are you sure you want to delete the product '${this.form.name}'`;
-            this.$root.confirmDestroy('Remove product', message, () => {
+            const title = this.$t('showModal.deleteConfirmation.title');
+            const message = this.$t('showModal.deleteConfirmation.message', {product_name: this.form.name});
+            // `Are you sure you want to delete the product '${this.form.name}'`;
+            this.$root.confirmDestroy(title, message, () => {
                 this.form.delete(route('products.destroy', this.form.uuid), {
                     onSuccess: () => { this.close(); },
                 });

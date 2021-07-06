@@ -38,7 +38,7 @@
                         >
                             <v-list-item-title>
                                 <inertia-link :href="route('logout')" method="post" as="button">
-                                    Log Out
+                                    {{ $t('appBar.logout') }}
                                 </inertia-link>
                             </v-list-item-title>
                         </v-list-item>

@@ -6,7 +6,7 @@
     >
         <v-card>
             <v-card-title>
-                <span class="mx-auto text-h5">History of "{{ product.name }}"</span>
+                <span class="mx-auto text-h5">{{ $t('historyModal.title', {product_name: product.name}) }}</span>
             </v-card-title>
 
             <v-card-text

@@ -10,9 +10,12 @@ import _ from "lodash";
 import Vuetify from "vuetify";
 import { InertiaApp } from "@inertiajs/inertia-vue";
 import Swal from "sweetalert2";
+import VueI18n from "vue-i18n";
 
 import "vuetify/dist/vuetify.min.css";
 import Vue from "vue";
+
+import translations from './I18n';
 
 window.Vue = require('vue').default;
 
@@ -23,18 +26,24 @@ Vue.mixin({ methods: { route } });
 
 require("./filters");
 
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
+const Toast = Swal.mixin({
+    toast: true,
+    position: "bottom",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: toast => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+    }
+});
+window.Toast = Toast;
 
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
-// Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+// Create VueI18n instance with options
+const i18n = new VueI18n({
+    locale: 'es', // set locale
+    messages: translations, // set locale translations
+})
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -42,23 +51,11 @@ require("./filters");
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: "bottom",
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    onOpen: toast => {
-        toast.addEventListener("mouseenter", Swal.stopTimer);
-        toast.addEventListener("mouseleave", Swal.resumeTimer);
-    }
-});
-window.Toast = Toast;
-
 const app = document.getElementById("app");
 
 new Vue({
     vuetify: new Vuetify(),
+    i18n,
     render: h =>
         h(InertiaApp, {
             props: {

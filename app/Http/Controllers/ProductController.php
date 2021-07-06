@@ -37,11 +37,11 @@ class ProductController extends Controller
         $this->tableName = (new Product)->getTable();
         $this->columns = [
             'uuid' => 'UUID',
-            'name' => 'Name',
-            'description' => 'Description',
-            'price' => 'Price',
-            'quantity' => 'Quantity',
-            'owner.name' => 'Owner',
+            'name' => __('table.name'),
+            'description' => __('table.description'),
+            'price' => __('table.price'),
+            'quantity' => __('table.quantity'),
+            'owner.name' => __('table.owner'),
         ];
     }
 
@@ -146,9 +146,9 @@ class ProductController extends Controller
             $productData['image'] = $path;
             Product::create($productData);
 
-            return redirect()->route('products.index')->with('success', 'Product created!');
+            return redirect()->route('products.index')->with('success', __('crud.store.success'));
         } catch (\Exception $e) {
-            return redirect()->route('products.index', [], 302)->with('error', 'Product could not be created. ' . $this->getError($e));
+            return redirect()->route('products.index', [], 302)->with('error', __('crud.store.error') . $this->getError($e));
         }
     }
 
@@ -166,10 +166,10 @@ class ProductController extends Controller
             Product::newBatch($request->products)->save()->now();
 
             DB::commit();
-            return redirect()->route('products.index')->with('success', 'Products created.');
+            return redirect()->route('products.index')->with('success', __('crud.bulkstore.success'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('products.index', [], 302)->with('error', 'Products could not be created. ' . $this->getError($e));
+            return redirect()->route('products.index', [], 302)->with('error', __('crud.bulkstore.error') . $this->getError($e));
         }
     }
 
@@ -237,9 +237,9 @@ class ProductController extends Controller
             }
 
             $product->update($productData);
-            return redirect()->route('products.index')->with('success', 'Product updated!');
+            return redirect()->route('products.index')->with('success', __('crud.update.success'));
         } catch (\Exception $e) {
-            return redirect()->route('products.index', [], 302)->with('error', 'Product could not be created. ' . $this->getError($e));
+            return redirect()->route('products.index', [], 302)->with('error', __('crud.update.error') . $this->getError($e));
         }
     }
 
@@ -265,10 +265,10 @@ class ProductController extends Controller
             Product::newBatch($products)->save()->now();
 
             DB::commit();
-            return redirect()->route('products.index')->with('success', 'Products saved.');
+            return redirect()->route('products.index')->with('success', __('crud.bulkupdate.success'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('products.index', [], 302)->with('error', 'Products could not be saved. ' . $this->getError($e));
+            return redirect()->route('products.index', [], 302)->with('error', __('crud.bulkupdate.error') . $this->getError($e));
         }
     }
 
@@ -282,9 +282,9 @@ class ProductController extends Controller
     {
         try {
             $product->delete();
-            return redirect()->route('products.index')->with('success', 'Product removed.');
+            return redirect()->route('products.index')->with('success', __('crud.destroy.success'));
         } catch(\Exception $e) {
-            return redirect()->route('products.index', [], 302)->with('error', 'The product could not be removed. ' . $this->getError($e));
+            return redirect()->route('products.index', [], 302)->with('error', __('crud.destroy.error') . $this->getError($e));
         }
     }
 
@@ -303,10 +303,10 @@ class ProductController extends Controller
                 ->delete();
             DB::commit();
 
-            return redirect()->route('products.index')->with('success', 'Products removed.');
+            return redirect()->route('products.index')->with('success', __('crud.bulkdestroy.success'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('products.index', [], 302)->with('error', 'The products could not be removed. ' . $this->getError($e));
+            return redirect()->route('products.index', [], 302)->with('error', __('crud.bulkdestroy.error') . $this->getError($e));
         }
     }
 

@@ -92,7 +92,7 @@
                     v-model="form.image"
                     show-size
                     accept="image/*"
-                    :label="label('product_image')"
+                    :label="label('image')"
                     :error="hasError(index, 'image')"
                     :error-messages="errorMessage(index, 'image')"
                 ></v-file-input>
@@ -101,12 +101,12 @@
                     v-if="imageSelected"
                     class="w-full"
                 >
-                    <h3 class="mb-5">Image selected:</h3>
+                    <h3 class="mb-5">{{ $t('form.selectedImage') }}:</h3>
 
                     <img
                         :src="imageSelected"
-                        alt="Selected image"
-                        title="Selected image"
+                        :alt="$t('form.selectedImage')"
+                        :title="$t('form.selectedImage')"
                         class="w-3/5 h-auto mx-auto"
                     >
                 </div>
@@ -184,9 +184,9 @@ export default {
         },
 
         label: function(field) {
-            if (field == 'description') return this.$options.filters.ucFirst(`${field}: `);
+            if (field == 'description') return `${this.$t(`form.${field}`)}: `;
 
-            return `${this.$options.filters.ucFirst(field.replaceAll('_', ' '))}: ${(!this.readonly) ? '*' : ''}`
+            return `${this.$t(`form.${field}`)}: ${(!this.readonly) ? '*' : ''}`
         },
         hasError: function(index, field) {
             return this.errors[`products.${index}.${field}`] != null || this.errors[field] != null;s
