@@ -1,56 +1,35 @@
 <template>
     <form @submit.prevent="store">
         <!-- Button to remove form if is not the first one -->
-        <v-row v-if="index > 0">
-            <v-spacer></v-spacer>
-
-            <v-tooltip
-                bottom
-            >
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                        class="mx-2"
-                        fab
-                        dark
-                        x-small
-                        color="red"
-                        v-on="on"
-                        @click="$emit('removeForm', index)"
-                        @mouseenter="showBorder = true"
-                        @mouseleave="showBorder = false"
-                    >
-                        <v-icon dark x-small>
-                            mdi-minus
-                        </v-icon>
-                    </v-btn>
-                </template>
-                Remove this form
-            </v-tooltip>
-        </v-row>
+        <RemoveFormButton
+            :index="index"
+            @removeForm="$emit('removeForm', index)"
+            @showBorder="(val) => showBorder = val"
+        />
 
         <v-row
-            :class="{'border-2 border-red-400': showBorder, 'border-2 border-transparent': !showBorder}"
+            :class="{'border-2 rounded-md border-red-400': showBorder, 'border-2 rounded-md border-transparent': !showBorder}"
         >
             <v-col cols="12">
                 <v-text-field
-                    :label="`Name: ${(!readonly) ? '*' : ''}`"
+                    :label="label('name')"
                     v-model="form.name"
                     required
                     :disabled="busy"
                     :readonly="readonly"
-                    :error="errors[`products.${index}.name`] != null || errors['name'] != null"
-                    :error-messages="errors[`products.${index}.name`] || errors['name']"
+                    :error="hasError(index, 'name')"
+                    :error-messages="errorMessage(index, 'name')"
                     @keyup="sync"
                 ></v-text-field>
             </v-col>
             <v-col cols="12">
                 <v-text-field
-                    label="Description: "
+                    :label="label('description')"
                     v-model="form.description"
                     :disabled="busy"
                     :readonly="readonly"
-                    :error="errors[`products.${index}.description`] != null || errors['description'] != null"
-                    :error-messages="errors[`products.${index}.description`] || errors['description']"
+                    :error="hasError(index, 'description')"
+                    :error-messages="errorMessage(index, 'description')"
                     @keyup="sync"
                 ></v-text-field>
             </v-col>
@@ -61,16 +40,16 @@
                 md="6"
             >
                 <v-text-field
-                    :label="`Price: ${(!readonly) ? '*' : ''}`"
+                    :label="label('price')"
                     v-model.number="form.price"
                     required
-                    :append-icon="(!readonly) ? 'mdi-plus' : null"
-                    :prepend-inner-icon="(!readonly) ? 'mdi-minus' : null"
+                    :append-icon="mdiPlusIcon"
+                    :prepend-inner-icon="mdiMinusIcon"
                     :disabled="busy"
                     :readonly="readonly"
-                    :error="errors[`products.${index}.price`] != null || errors['price'] != null"
-                    :error-messages="errors[`products.${index}.price`] || errors['price']"
-                    @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync()"
+                    :error="hasError(index, 'price')"
+                    :error-messages="errorMessage(index, 'price')"
+                    @keyup="numberKeyUp"
                     @click:prepend-inner="sub('price');"
                     @click:append="add('price');"
                 ></v-text-field>
@@ -81,16 +60,16 @@
                 md="6"
             >
                 <v-text-field
-                    :label="`Quantity: ${(!readonly) ? '*' : ''}`"
+                    :label="label('quantity')"
                     v-model.number="form.quantity"
                     required
-                    :append-icon="(!readonly) ? 'mdi-plus' : null"
-                    :prepend-inner-icon="(!readonly) ? 'mdi-minus' : null"
+                    :append-icon="mdiPlusIcon"
+                    :prepend-inner-icon="mdiMinusIcon"
                     :disabled="busy"
                     :readonly="readonly"
-                    :error="errors[`products.${index}.quantity`] != null || errors['quantity'] != null"
-                    :error-messages="errors[`products.${index}.quantity`] || errors['quantity']"
-                    @keyup="$event.target.value = $options.filters.onlyNumbers($event.target.value); sync()"
+                    :error="hasError(index, 'quantity')"
+                    :error-messages="errorMessage(index, 'quantity')"
+                    @keyup="numberKeyUp"
                     @click:prepend-inner="sub('quantity');"
                     @click:append="add('quantity');"
                 ></v-text-field>
@@ -113,9 +92,9 @@
                     v-model="form.image"
                     show-size
                     accept="image/*"
-                    :label="`Product image: ${(!readonly) ? '*' : ''}`"
-                    :error="errors[`products.${index}.image`] != null || errors['image'] != null"
-                    :error-messages="errors[`products.${index}.image`] || errors['image']"
+                    :label="label('product_image')"
+                    :error="hasError(index, 'image')"
+                    :error-messages="errorMessage(index, 'image')"
                 ></v-file-input>
 
                 <div
@@ -137,6 +116,7 @@
 </template>
 
 <script>
+import RemoveFormButton from '@/Components/Products/RemoveFormButton';
 export default {
     name: 'product-form',
     props: {
@@ -149,6 +129,9 @@ export default {
         busy: Boolean,
         readonly: Boolean,
         requiresImage: Boolean,
+    },
+    components: {
+        RemoveFormButton,
     },
     emits: ['syncForm', 'removeForm'],
 
@@ -168,6 +151,15 @@ export default {
 
     mounted: function() {
         this.formFill();
+    },
+
+    computed: {
+        mdiPlusIcon: function() {
+            return (!this.readonly) ? 'mdi-plus' : null;
+        },
+        mdiMinusIcon: function() {
+            return (!this.readonly) ? 'mdi-minus' : null;
+        },
     },
 
     watch: {
@@ -191,6 +183,23 @@ export default {
             Object.assign(this.form, this.$_.pick(this.product, ['name', 'description', 'price', 'quantity']));
         },
 
+        label: function(field) {
+            if (field == 'description') return this.$options.filters.ucFirst(`${field}: `);
+
+            return `${this.$options.filters.ucFirst(field.replaceAll('_', ' '))}: ${(!this.readonly) ? '*' : ''}`
+        },
+        hasError: function(index, field) {
+            return this.errors[`products.${index}.${field}`] != null || this.errors[field] != null;s
+        },
+        errorMessage: function(index, field) {
+            return this.errors[`products.${index}.${field}`] || this.errors[field];
+        },
+
+        // Number methods
+        numberKeyUp: function(event) {
+            event.target.value = this.$options.filters.onlyNumbers(event.target.value);
+            sync();
+        },
         sub: function(property) {
             if (this.readonly) return;
             if (this.form[property] > 0) {
