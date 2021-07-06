@@ -229,7 +229,14 @@ class ProductController extends Controller
     public function update(UpdateRequest $request, Product $product)
     {
         try {
-            $product->update($request->all());
+            $productData = $request->all();
+            if ($request->file('image')) {
+                $filename = $request->file('image')->getClientOriginalName();
+                $path = $request->file('image')->storeAs('images/products', $filename);
+                $productData['image'] = $path;
+            }
+
+            $product->update($productData);
             return redirect()->route('products.index')->with('success', 'Product updated!');
         } catch (\Exception $e) {
             return redirect()->route('products.index', [], 302)->with('error', 'Product could not be created. ' . $this->getError($e));

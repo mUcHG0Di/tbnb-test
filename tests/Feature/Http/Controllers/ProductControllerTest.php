@@ -58,6 +58,7 @@ class ProductControllerTest extends TestCase
     public function it_updates_a_single_product()
     {
         $this->product->save();
+        $this->product->image = UploadedFile::fake()->image('product-edited.jpg');
         $newName = 'Named edited';
         $this->product->name = $newName;
 
@@ -70,6 +71,8 @@ class ProductControllerTest extends TestCase
         $this->assertDatabaseHas('products', [
             'name' => $newName
         ]);
+
+        Storage::assertExists('images/products/product-edited.jpg');
     }
 
     /** @test */
