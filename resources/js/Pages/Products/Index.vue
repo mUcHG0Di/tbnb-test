@@ -19,6 +19,7 @@
                 :columns="queryBuilderProps.columns"
                 :on-update="setQueryBuilder"
                 :meta="products"
+                @exportToExcel="exportToExcel"
             >
                 <template #head>
                     <tr>
@@ -99,7 +100,9 @@
     import ShowModal from '@/Components/Products/ShowModal';
     import FormModal from '@/Components/Products/FormModal';
     import HistoryModal from '@/Components/Products/HistoryModal';
-    import { InteractsWithQueryBuilder, Tailwind2, Components } from '@protonemedia/inertiajs-tables-laravel-query-builder';
+    import InteractsWithQueryBuilder from '@/InteractsWithQueryBuilder.vue';
+    import Table from '@/Components/Protonemedia/Table';
+    import { Components } from '@protonemedia/inertiajs-tables-laravel-query-builder';
 
     export default {
         name: 'products-index',
@@ -119,7 +122,7 @@
             ShowModal,
             FormModal,
             HistoryModal,
-            Table: Tailwind2.Table,
+            Table,
         },
 
         data: function() {
@@ -175,7 +178,7 @@
                 this.historyDialog = this.historyDialogOpened;
             }
 
-            this.configDatatable();
+            // this.configDatatable();
         },
 
         methods: {
@@ -249,6 +252,12 @@
                 this.$inertia.visit(route('products.index'), {
                     only: ['products'],
                 })
+            },
+
+            exportToExcel: function() {
+                const query = this.queryBuilderString;
+                const url = route('excel.export');
+                window.location.href = `${url}?${query}&model=${this.model}`
             },
         },
     }

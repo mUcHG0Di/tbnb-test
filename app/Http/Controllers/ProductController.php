@@ -8,12 +8,14 @@ use App\Http\Requests\Products\DestroyRequest;
 use App\Http\Requests\Products\StoreRequest;
 use App\Http\Requests\Products\UpdateRequest;
 use App\Models\Product;
+use App\Sorts\Product\OwnerSort;
 use Illuminate\Support\Arr;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use ProtoneMedia\LaravelQueryBuilderInertiaJs\InertiaTable;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductController extends Controller
@@ -31,6 +33,15 @@ class ProductController extends Controller
      * @var array
      */
     protected $columns;
+
+    /**
+     * Columns that are not VARCHAR
+     *
+     * @var array
+     */
+    protected $notStringColumns = [
+        'uuid', 'price', 'quantity'
+    ];
 
     public function __construct()
     {
@@ -58,7 +69,7 @@ class ProductController extends Controller
 
         $products = QueryBuilder::for(Product::class)
                                 ->defaultSort('name')
-                                ->allowedSorts(array_keys($this->columns))
+                                ->allowedSorts($this->getAllowedSorts())
                                 ->allowedFilters($this->getAllowedFilters());
 
         // Load the relationships from $withRelations parameter into the query
@@ -83,12 +94,24 @@ class ProductController extends Controller
                 ->orWhere('quantity', 'ILIKE', "%{$value}%");
         });
 
+        $notStringCallbacks = array_map(fn($col) => AllowedFilter::callback($col, fn($query, $value) => $query->where($col, 'LIKE', "%{$value}%")), $this->notStringColumns);
+
         return [
-            ...array_keys(Arr::except($this->columns, ['uuid', 'price', 'quantity'])),
-            AllowedFilter::callback('uuid', fn($query, $value) => $query->where('uuid', 'LIKE', "%{$value}%")),
-            AllowedFilter::callback('price', fn($query, $value) => $query->where('price', 'LIKE', "%{$value}%")),
-            AllowedFilter::callback('quantity', fn($query, $value) => $query->where('uuid', 'LIKE', "%{$value}%")),
+            ...array_keys(Arr::except($this->columns, $this->notStringColumns)),
+            ...$notStringCallbacks,
             $globalSearch
+        ];
+    }
+
+    /**
+     * Allowed sorts for the query builder
+     *
+     * @return array
+     */
+    private function getAllowedSorts() {
+        return [
+            ...array_keys(Arr::except($this->columns, 'owner.name')),
+            AllowedSort::custom('owner.name', new OwnerSort()),
         ];
     }
 

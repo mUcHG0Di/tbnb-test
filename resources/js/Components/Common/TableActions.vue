@@ -6,17 +6,6 @@
 
 
         <div class="flex flex-row flex-wrap items-center justify-end w-full sm:w-auto">
-            <!-- <div class="w-1/2 px-2 my-2 sm:w-auto">
-                <v-btn
-                    elevation="1"
-                    color="purple darken"
-                    class="w-full white--text"
-                    @click="$emit('excel')"
-                >
-                    <v-icon small class="mr-1">mdi-file-excel-outline</v-icon>
-                    Excel
-                </v-btn>
-            </div> -->
             <div class="w-1/2 px-2 my-2 sm:w-auto">
                 <v-btn
                     elevation="1"
