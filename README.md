@@ -18,7 +18,7 @@ This project is a technical test implementation for a job offer. It's a CRUD (Cr
 
 ## Prerequisites
 
-- PHP >= 8.1
+- PHP >= 7.4
 - Composer
 - Node.js >= 14.x
 - NPM or Yarn
